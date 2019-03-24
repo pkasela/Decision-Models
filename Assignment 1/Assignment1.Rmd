@@ -1,0 +1,160 @@
+---
+title: 'Assignment 1: Printed circuits'
+author: "null"
+date: "18-03-2019"
+output: 
+  #pdf_document: 
+  #  df_print: paged
+  #  highlight: tango 
+  #  toc: yes
+  #  toc_depth: 5
+  html_document:
+    code_download: yes
+    df_print: paged
+    highlight: textmate
+    theme: spacelab
+    toc: yes
+    toc_depth: 5
+  #html_notebook:
+  #  df_print: paged
+  #  highlight: textmate
+  #  theme: spacelab
+  #  toc: yes
+  #  toc_depth: 5
+---
+
+```{r r_setup, include = FALSE}
+## initial settings
+knitr::opts_chunk$set(
+  comment = NA,
+  echo = TRUE,
+  error = TRUE,
+  cache = FALSE,
+  message = FALSE,
+  dpi = 200,
+  warning = FALSE
+)
+
+## width to use when printing tables etc.
+options(
+  width = 250,
+  scipen = 100,
+  max.print = 5000,
+  stringsAsFactors = FALSE
+)
+```
+
+<style>
+.table {
+  width: auto;
+}
+ul, ol {
+  padding-left: 18px;
+}
+pre, code, pre code {
+  overflow: auto;
+  white-space: pre;
+  word-wrap: normal;
+  background-color: #ffffff;
+}
+</style>
+
+## Introduction
+*MC Manufacturing* has contracted to provide *DISCO Electronics* with printed circuit ("PC") boards under
+the following terms: (1) 100,000 PC boards will be delivered to DISCO in one month, and (2) DISCO has an
+option to take delivery of an additional 100,000 boards in three months by giving Aba 30 days notice. DISCO
+will pay $5.00 for each board that it purchases. MC manufactures the PC boards using a batch process, and
+manufacturing costs are as follows: (1) there is a fixed setup cost of $250,000 for any manufacturing batch
+run, regardless of the size of the run, and (2) there is a marginal  manufacturing cost of $2.00 per board
+regardless of the size of the batch run. MC must decide whether to manufacture all 200,000 PC boards now or
+whether to only manufacture 100,000 now and manufacture the other 100,000 boards only if DISCO exercises its
+option to buy those boards. If MC manufactures 200,000 now and DISCO does not exercise its option, then the
+manufacturing cost of the extra 100,000 boards will be totally lost. MC believes there is a 50% chance DISCO
+will exercise its option to buy the additional 100,000 PC boards.
+
+## The decision tree
+
+-  Draw a decision tree for the decision that MC faces.
+
+```{r loading, message=FALSE}
+library(yaml)
+library(radiant)
+library(radiant.model)
+```
+
+```{r Solution Tree}
+tree = yaml.load_file(input = "./Board_Production.yaml")
+
+result =dtree(yl = tree)
+plot(result, final = FALSE)
+```
+
+
+## Expected value
+-  Determine the preferred course of action for MC assuming it uses expected profit as its decision criterion.
+
+```{r Expected Value}
+summary(result, input = FALSE, output = TRUE)
+
+plot(result, final = TRUE)
+```
+
+## Utility Function and Certainty Equivalent
+
+Assume that all the information still holds, except assume now that MC has an exponential utility function with a risk tolerance of $100,000.
+
+```{r Define Utility Functions}
+utilityFunctionExp <- function(X, R) {
+res <- 1- exp(-X/R)
+return(res)
+}
+
+CertEquivalent = function(EU, R){
+CE = -R*ln(1-EU)
+return(CE)
+}
+
+CalcExpectedUtilityFunction = function(profit, R){
+  #------Branch 1----------#
+  UF1 = utilityFunctionExp(profit$profitBranch1, R)
+  UF1_A = UF1[1]*0.5 + UF1[2]*0.5
+
+  #-----Branch 2----------#
+  UF2 = utilityFunctionExp(profit$profitBranch2, R)
+  UF2_A = UF2[1]*0.5 + UF2[2]*0.5
+  
+  #----Return Final Result----#
+  return(c(UF1_A, UF2_A))
+}
+
+CalcBranchCE = function(profit, R){
+CE_vett = CertEquivalent(CalcExpectedUtilityFunction(profit, R), R)
+return(CE_vett)
+}
+
+#Create a DataFrame with Profits per Branch
+
+index <- 1:2
+profitBranch1 <- c(35,-15)
+profitBranch2 <- c(10,5)
+profit <- data.frame("X"=index,"profitBranch1"=profitBranch1,"profitBranch2"=profitBranch2)
+R=10
+
+CE <- CalcBranchCE(profit,R)
+
+CE_Branch1 <- CE[1]
+CE_Branch2 <- CE[2]
+```
+- Determine MC's preferred course of action.
+
+## Modification of the process
+
+For the decision in the preceding point, MC Manufacturing has created a new option: it can conduct some research and development in an attempt to lower the fixed setup cost associated with manufacturing a batch of the PC boards. This research and development would not be completed in time to influence the setup cost for the initial batch that DISCO has ordered, but would be completed before the second batch would have to be manufactured. The research and development will cost $25,000, and there is a 0.4 probability that it will be successful. If it is successful, then the fixed setup cost per batch will be reduced by $200,000 to $50,000. If the research and development is not successful, then there will be no reduction in the setup cost. There will be no other benefits from the research and development besides the potential reduction in setup cost for the DISCO reorder.
+
+- Using expected profit as the decision criterion, determine whether MC should undertake the research and development.
+
+## Value of Information
+
+Using expected profit as the decision criteria, determine the value of learning for certain whether the research and development will be successful before a decision has to be made about whether to initially manufacture 100,000 or 200,000 PC boards.
+
+
