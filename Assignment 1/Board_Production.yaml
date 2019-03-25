@@ -1,4 +1,4 @@
-name: Borad Production Decision
+name: Board Production Decision
 variables:
     setup cost: 25
     manifacture cost: 20
