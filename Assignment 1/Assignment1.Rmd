@@ -170,7 +170,14 @@ plot(result_RnD, final = TRUE)
 Using expected profit as the decision criteria, determine the value of learning for certain whether the research and development will be successful before a decision has to be made about whether to initially manufacture 100,000 or 200,000 PC boards.
 
 ```{r Value of Information}
+tree_PI = yaml.load_file(input = "./Board_Production_PI.yaml")
+result_PI = dtree(yl = tree_PI)
 
+plot(result_PI, final=FALSE)
+
+summary(result_PI, input = FALSE, output = TRUE)
+
+plot(result_PI, final = TRUE)
 ```
 
 
