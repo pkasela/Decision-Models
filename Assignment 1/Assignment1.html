@@ -257,12 +257,13 @@ pre, code, pre code {
 <pre class="r"><code>library(yaml)
 library(radiant)
 library(radiant.model)</code></pre>
-<pre class="r"><code>tree = yaml.load_file(input = &quot;./Board_Production.yaml&quot;)
+<pre class="r"><code>setwd(&quot;/home/pranav/Desktop/Decision Models Assignments/Assignment 1/&quot;)
+tree = yaml.load_file(input = &quot;./Board_Production.yaml&quot;)
 
 result =dtree(yl = tree)
 plot(result, final = FALSE)</code></pre>
-<div id="htmlwidget-d5bd3873cebc196a92be" style="width:900px;height:100%;" class="DiagrammeR html-widget"></div>
-<script type="application/json" data-for="htmlwidget-d5bd3873cebc196a92be">{"x":{"diagram":"graph LR\n id1[ ] --- |Produce Everything| id2(( ))\n id1[ ] --- |Don't Produce Everything| id5(( ))\nid2 --- |Extra Quantity: 0.5000| id3[\"$\"35.00]\nid2 --- |No Extra Quantity: 0.5000| id4[\"$\"-15.00]\nid5 --- |Extra Quantity: 0.5000| id6[\"$\"10.00]\nid5 --- |No Extra Quantity: 0.5000| id7[\"$\"5.00]\n\nclassDef default fill:none, bg:none, stroke-width:0px;\n    classDef chance fill:#FF8C00,stroke:#333,stroke-width:1px;\n    classDef chance_with_cost fill:#FF8C00,stroke:#333,stroke-width:3px,stroke-dasharray:4,5;\n    classDef decision fill:#9ACD32,stroke:#333,stroke-width:1px;\n    classDef decision_with_cost fill:#9ACD32,stroke:#333,stroke-width:3px,stroke-dasharray:4,5;\n    class id1 decision;\n    class id_null decision_with_cost;\n    class id2,id5 chance;\n    class id_null chance_with_cost;"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-8d45f0990db9e54117b6" style="width:900px;height:100%;" class="DiagrammeR html-widget"></div>
+<script type="application/json" data-for="htmlwidget-8d45f0990db9e54117b6">{"x":{"diagram":"graph LR\n id1[ ] --- |Produce Everything| id2(( ))\n id1[ ] --- |Don't Produce Everything| id5(( ))\nid2 --- |Extra Quantity: 0.5000| id3[\"$\"35.00]\nid2 --- |No Extra Quantity: 0.5000| id4[\"$\"-15.00]\nid5 --- |Extra Quantity: 0.5000| id6[\"$\"10.00]\nid5 --- |No Extra Quantity: 0.5000| id7[\"$\"5.00]\n\nclassDef default fill:none, bg:none, stroke-width:0px;\n    classDef chance fill:#FF8C00,stroke:#333,stroke-width:1px;\n    classDef chance_with_cost fill:#FF8C00,stroke:#333,stroke-width:3px,stroke-dasharray:4,5;\n    classDef decision fill:#9ACD32,stroke:#333,stroke-width:1px;\n    classDef decision_with_cost fill:#9ACD32,stroke:#333,stroke-width:3px,stroke-dasharray:4,5;\n    class id1 decision;\n    class id_null decision_with_cost;\n    class id2,id5 chance;\n    class id_null chance_with_cost;"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="expected-value" class="section level2">
 <h2>Expected value</h2>
@@ -290,7 +291,7 @@ payoff_not_toghether_not_extra   5.0
 
 Initial decision tree:
                               Probability Payoff Cost     Type
- Borad Production Decision                                    
+ Board Production Decision                                    
   ¦--Produce Everything                               decision
   ¦   ¦--Extra Quantity           50.00 %  35.00        chance
   ¦   °--No Extra Quantity        50.00 % -15.00        chance
@@ -300,7 +301,7 @@ Initial decision tree:
 
 Final decision tree:
                               Probability Payoff Cost     Type
- Borad Production Decision                 10.00              
+ Board Production Decision                 10.00              
   ¦--Produce Everything                    10.00      decision
   ¦   ¦--Extra Quantity           50.00 %  35.00        chance
   ¦   °--No Extra Quantity        50.00 % -15.00        chance
@@ -308,8 +309,8 @@ Final decision tree:
       ¦--Extra Quantity           50.00 %  10.00        chance
       °--No Extra Quantity        50.00 %   5.00        chance</code></pre>
 <pre class="r"><code>plot(result, final = TRUE)</code></pre>
-<div id="htmlwidget-698bc6d894ac1f8e1c42" style="width:900px;height:100%;" class="DiagrammeR html-widget"></div>
-<script type="application/json" data-for="htmlwidget-698bc6d894ac1f8e1c42">{"x":{"diagram":"graph LR\n id1[\"$\"10.00] === |Produce Everything| id2((\"$\"10.00))\n id1[\"$\"10.00] --- |Don't Produce Everything| id5((\"$\"7.50))\nid2 --- |Extra Quantity: 0.5000| id3[\"$\"35.00]\nid2 --- |No Extra Quantity: 0.5000| id4[\"$\"-15.00]\nid5 --- |Extra Quantity: 0.5000| id6[\"$\"10.00]\nid5 --- |No Extra Quantity: 0.5000| id7[\"$\"5.00]\n\nclassDef default fill:none, bg:none, stroke-width:0px;\n    classDef chance fill:#FF8C00,stroke:#333,stroke-width:1px;\n    classDef chance_with_cost fill:#FF8C00,stroke:#333,stroke-width:3px,stroke-dasharray:4,5;\n    classDef decision fill:#9ACD32,stroke:#333,stroke-width:1px;\n    classDef decision_with_cost fill:#9ACD32,stroke:#333,stroke-width:3px,stroke-dasharray:4,5;\n    class id1 decision;\n    class id_null decision_with_cost;\n    class id2,id5 chance;\n    class id_null chance_with_cost;"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-52cb0bfe8f555226c651" style="width:900px;height:100%;" class="DiagrammeR html-widget"></div>
+<script type="application/json" data-for="htmlwidget-52cb0bfe8f555226c651">{"x":{"diagram":"graph LR\n id1[\"$\"10.00] === |Produce Everything| id2((\"$\"10.00))\n id1[\"$\"10.00] --- |Don't Produce Everything| id5((\"$\"7.50))\nid2 --- |Extra Quantity: 0.5000| id3[\"$\"35.00]\nid2 --- |No Extra Quantity: 0.5000| id4[\"$\"-15.00]\nid5 --- |Extra Quantity: 0.5000| id6[\"$\"10.00]\nid5 --- |No Extra Quantity: 0.5000| id7[\"$\"5.00]\n\nclassDef default fill:none, bg:none, stroke-width:0px;\n    classDef chance fill:#FF8C00,stroke:#333,stroke-width:1px;\n    classDef chance_with_cost fill:#FF8C00,stroke:#333,stroke-width:3px,stroke-dasharray:4,5;\n    classDef decision fill:#9ACD32,stroke:#333,stroke-width:1px;\n    classDef decision_with_cost fill:#9ACD32,stroke:#333,stroke-width:3px,stroke-dasharray:4,5;\n    class id1 decision;\n    class id_null decision_with_cost;\n    class id2,id5 chance;\n    class id_null chance_with_cost;"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="utility-function-and-certainty-equivalent" class="section level2">
 <h2>Utility Function and Certainty Equivalent</h2>
@@ -353,12 +354,7 @@ R=10
 CE &lt;- CalcBranchCE(profit,R)
 
 CE_Branch1 &lt;- CE[1]
-CE_Branch2 &lt;- CE[2]
-
-if (CE_Branch2&gt;CE_Branch1)
-  print(&quot;The optimal choise is the second Branch&quot;) else
-  print(&quot;The optimal choise is the first Branch&quot;)</code></pre>
-<pre><code>[1] &quot;The optimal choise is the second Branch&quot;</code></pre>
+CE_Branch2 &lt;- CE[2]</code></pre>
 <ul>
 <li>Determine MC’s preferred course of action.</li>
 </ul>
@@ -369,13 +365,86 @@ if (CE_Branch2&gt;CE_Branch1)
 <ul>
 <li>Using expected profit as the decision criterion, determine whether MC should undertake the research and development.</li>
 </ul>
+<pre class="r"><code>tree_RnD = yaml.load_file(input = &quot;./Board_Production_RnD.yaml&quot;)
+result_RnD = dtree(yl = tree_RnD)
+
+plot(result_RnD, final=FALSE)</code></pre>
+<div id="htmlwidget-ed02022d0d86d2662ecc" style="width:900px;height:100%;" class="DiagrammeR html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ed02022d0d86d2662ecc">{"x":{"diagram":"graph LR\n id1[ ] --- |Produce Everything| id2(( ))\n id1[ ] --- |Don't Produce Everything| id5(( ))\n id1[ ] --- |Research & Development| id8(( ))\nid2 --- |Extra Quantity: 0.5000| id3[\"$\"35.00]\nid2 --- |No Extra Quantity: 0.5000| id4[\"$\"-15.00]\nid5 --- |Extra Quantity: 0.5000| id6[\"$\"10.00]\nid5 --- |No Extra Quantity: 0.5000| id7[\"$\"5.00]\nid8 --- |R&D Success: 0.4000| id9(( ))\nid8 --- |R&D Failure: 0.6000| id12(( ))\nid9 --- |Extra Quantity: 0.5000| id10[\"$\"27.50]\nid9 --- |No Extra Quantity: 0.5000| id11[\"$\"2.50]\nid12 --- |Extra Quantity: 0.5000| id13[\"$\"7.50]\nid12 --- |No Extra Quantity: 0.5000| id14[\"$\"2.50]\n\nclassDef default fill:none, bg:none, stroke-width:0px;\n    classDef chance fill:#FF8C00,stroke:#333,stroke-width:1px;\n    classDef chance_with_cost fill:#FF8C00,stroke:#333,stroke-width:3px,stroke-dasharray:4,5;\n    classDef decision fill:#9ACD32,stroke:#333,stroke-width:1px;\n    classDef decision_with_cost fill:#9ACD32,stroke:#333,stroke-width:3px,stroke-dasharray:4,5;\n    class id1 decision;\n    class id_null decision_with_cost;\n    class id2,id5,id8,id9,id12 chance;\n    class id_null chance_with_cost;"},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>summary(result_RnD, input = FALSE, output = TRUE)</code></pre>
+<pre><code>Variable input values:
+                                    
+setup_cost                      25.0
+manifacture_cost                20.0
+research_cost                    2.5
+manifacture_RnD_cost             5.0
+unit_revenue                    50.0
+prob_extra                       0.5
+prob_not_extra                   0.5
+prob_RnD_success                 0.4
+prob_RnD_fail                    0.6
+cost_toghether_extra            65.0
+cost_toghether_not_extra        65.0
+cost_not_together_extra         90.0
+cost_not_together_not_extra     45.0
+revenue_extra                  100.0
+revenue_not_extra               50.0
+payoff_toghether_extra          35.0
+payoff_toghether_not_extra     -15.0
+payoff_not_toghether_extra      10.0
+payoff_not_toghether_not_extra   5.0
+cost_RnD_success_extra          72.5
+cost_RnD_success_not_extra      47.5
+cost_RnD_fail_extra             92.5
+cost_RnD_fail_not_extra         47.5
+payoff_RnD_success_extra        27.5
+payoff_RnD_success_not_extra     2.5
+payoff_RnD_fail_extra            7.5
+payoff_RnD_fail_not_extra        2.5
+
+Initial decision tree:
+                               Probability Payoff Cost     Type
+ Board Production Decision RnD                                 
+  ¦--Produce Everything                                decision
+  ¦   ¦--Extra Quantity            50.00 %  35.00        chance
+  ¦   °--No Extra Quantity         50.00 % -15.00        chance
+  ¦--Don't Produce Everything                          decision
+  ¦   ¦--Extra Quantity            50.00 %  10.00        chance
+  ¦   °--No Extra Quantity         50.00 %   5.00        chance
+  °--Research &amp; Development                            decision
+      ¦--R&amp;D Success               40.00 %               chance
+      ¦   ¦--Extra Quantity        50.00 %  27.50        chance
+      ¦   °--No Extra Quantity     50.00 %   2.50        chance
+      °--R&amp;D Failure               60.00 %               chance
+          ¦--Extra Quantity        50.00 %   7.50        chance
+          °--No Extra Quantity     50.00 %   2.50        chance
+
+Final decision tree:
+                               Probability Payoff Cost     Type
+ Board Production Decision RnD              10.00              
+  ¦--Produce Everything                     10.00      decision
+  ¦   ¦--Extra Quantity            50.00 %  35.00        chance
+  ¦   °--No Extra Quantity         50.00 % -15.00        chance
+  ¦--Don't Produce Everything                7.50      decision
+  ¦   ¦--Extra Quantity            50.00 %  10.00        chance
+  ¦   °--No Extra Quantity         50.00 %   5.00        chance
+  °--Research &amp; Development                  9.00      decision
+      ¦--R&amp;D Success               40.00 %  15.00        chance
+      ¦   ¦--Extra Quantity        50.00 %  27.50        chance
+      ¦   °--No Extra Quantity     50.00 %   2.50        chance
+      °--R&amp;D Failure               60.00 %   5.00        chance
+          ¦--Extra Quantity        50.00 %   7.50        chance
+          °--No Extra Quantity     50.00 %   2.50        chance</code></pre>
+<pre class="r"><code>plot(result_RnD, final = TRUE)</code></pre>
+<div id="htmlwidget-ff8b48f410e18f1de6c2" style="width:900px;height:100%;" class="DiagrammeR html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ff8b48f410e18f1de6c2">{"x":{"diagram":"graph LR\n id1[\"$\"10.00] === |Produce Everything| id2((\"$\"10.00))\n id1[\"$\"10.00] --- |Don't Produce Everything| id5((\"$\"7.50))\n id1[\"$\"10.00] --- |Research & Development| id8((\"$\"9.00))\nid2 --- |Extra Quantity: 0.5000| id3[\"$\"35.00]\nid2 --- |No Extra Quantity: 0.5000| id4[\"$\"-15.00]\nid5 --- |Extra Quantity: 0.5000| id6[\"$\"10.00]\nid5 --- |No Extra Quantity: 0.5000| id7[\"$\"5.00]\nid8 --- |R&D Success: 0.4000| id9((\"$\"15.00))\nid8 --- |R&D Failure: 0.6000| id12((\"$\"5.00))\nid9 --- |Extra Quantity: 0.5000| id10[\"$\"27.50]\nid9 --- |No Extra Quantity: 0.5000| id11[\"$\"2.50]\nid12 --- |Extra Quantity: 0.5000| id13[\"$\"7.50]\nid12 --- |No Extra Quantity: 0.5000| id14[\"$\"2.50]\n\nclassDef default fill:none, bg:none, stroke-width:0px;\n    classDef chance fill:#FF8C00,stroke:#333,stroke-width:1px;\n    classDef chance_with_cost fill:#FF8C00,stroke:#333,stroke-width:3px,stroke-dasharray:4,5;\n    classDef decision fill:#9ACD32,stroke:#333,stroke-width:1px;\n    classDef decision_with_cost fill:#9ACD32,stroke:#333,stroke-width:3px,stroke-dasharray:4,5;\n    class id1 decision;\n    class id_null decision_with_cost;\n    class id2,id5,id8,id9,id12 chance;\n    class id_null chance_with_cost;"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="value-of-information" class="section level2">
 <h2>Value of Information</h2>
 <p>Using expected profit as the decision criteria, determine the value of learning for certain whether the research and development will be successful before a decision has to be made about whether to initially manufacture 100,000 or 200,000 PC boards.</p>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAnQXNzaWdubWVudCAxOiBQcmludGVkIGNpcmN1aXRzJwphdXRob3I6ICJudWxsIgpkYXRlOiAiMTgtMDMtMjAxOSIKb3V0cHV0OiAKICAjcGRmX2RvY3VtZW50OiAKICAjICBkZl9wcmludDogcGFnZWQKICAjICBoaWdobGlnaHQ6IHRhbmdvIAogICMgIHRvYzogeWVzCiAgIyAgdG9jX2RlcHRoOiA1CiAgaHRtbF9kb2N1bWVudDoKICAgIGNvZGVfZG93bmxvYWQ6IHllcwogICAgZGZfcHJpbnQ6IHBhZ2VkCiAgICBoaWdobGlnaHQ6IHRleHRtYXRlCiAgICB0aGVtZTogc3BhY2VsYWIKICAgIHRvYzogeWVzCiAgICB0b2NfZGVwdGg6IDUKICAjaHRtbF9ub3RlYm9vazoKICAjICBkZl9wcmludDogcGFnZWQKICAjICBoaWdobGlnaHQ6IHRleHRtYXRlCiAgIyAgdGhlbWU6IHNwYWNlbGFiCiAgIyAgdG9jOiB5ZXMKICAjICB0b2NfZGVwdGg6IDUKLS0tCgpgYGB7ciByX3NldHVwLCBpbmNsdWRlID0gRkFMU0V9CiMjIGluaXRpYWwgc2V0dGluZ3MKa25pdHI6Om9wdHNfY2h1bmskc2V0KAogIGNvbW1lbnQgPSBOQSwKICBlY2hvID0gVFJVRSwKICBlcnJvciA9IFRSVUUsCiAgY2FjaGUgPSBGQUxTRSwKICBtZXNzYWdlID0gRkFMU0UsCiAgZHBpID0gMjAwLAogIHdhcm5pbmcgPSBGQUxTRQopCgojIyB3aWR0aCB0byB1c2Ugd2hlbiBwcmludGluZyB0YWJsZXMgZXRjLgpvcHRpb25zKAogIHdpZHRoID0gMjUwLAogIHNjaXBlbiA9IDEwMCwKICBtYXgucHJpbnQgPSA1MDAwLAogIHN0cmluZ3NBc0ZhY3RvcnMgPSBGQUxTRQopCmBgYAoKPHN0eWxlPgoudGFibGUgewogIHdpZHRoOiBhdXRvOwp9CnVsLCBvbCB7CiAgcGFkZGluZy1sZWZ0OiAxOHB4Owp9CnByZSwgY29kZSwgcHJlIGNvZGUgewogIG92ZXJmbG93OiBhdXRvOwogIHdoaXRlLXNwYWNlOiBwcmU7CiAgd29yZC13cmFwOiBub3JtYWw7CiAgYmFja2dyb3VuZC1jb2xvcjogI2ZmZmZmZjsKfQo8L3N0eWxlPgoKIyMgSW50cm9kdWN0aW9uCipNQyBNYW51ZmFjdHVyaW5nKiBoYXMgY29udHJhY3RlZCB0byBwcm92aWRlICpESVNDTyBFbGVjdHJvbmljcyogd2l0aCBwcmludGVkIGNpcmN1aXQgKCJQQyIpIGJvYXJkcyB1bmRlcgp0aGUgZm9sbG93aW5nIHRlcm1zOiAoMSkgMTAwLDAwMCBQQyBib2FyZHMgd2lsbCBiZSBkZWxpdmVyZWQgdG8gRElTQ08gaW4gb25lIG1vbnRoLCBhbmQgKDIpIERJU0NPIGhhcyBhbgpvcHRpb24gdG8gdGFrZSBkZWxpdmVyeSBvZiBhbiBhZGRpdGlvbmFsIDEwMCwwMDAgYm9hcmRzIGluIHRocmVlIG1vbnRocyBieSBnaXZpbmcgQWJhIDMwIGRheXMgbm90aWNlLiBESVNDTwp3aWxsIHBheSAkNS4wMCBmb3IgZWFjaCBib2FyZCB0aGF0IGl0IHB1cmNoYXNlcy4gTUMgbWFudWZhY3R1cmVzIHRoZSBQQyBib2FyZHMgdXNpbmcgYSBiYXRjaCBwcm9jZXNzLCBhbmQKbWFudWZhY3R1cmluZyBjb3N0cyBhcmUgYXMgZm9sbG93czogKDEpIHRoZXJlIGlzIGEgZml4ZWQgc2V0dXAgY29zdCBvZiAkMjUwLDAwMCBmb3IgYW55IG1hbnVmYWN0dXJpbmcgYmF0Y2gKcnVuLCByZWdhcmRsZXNzIG9mIHRoZSBzaXplIG9mIHRoZSBydW4sIGFuZCAoMikgdGhlcmUgaXMgYSBtYXJnaW5hbCAgbWFudWZhY3R1cmluZyBjb3N0IG9mICQyLjAwIHBlciBib2FyZApyZWdhcmRsZXNzIG9mIHRoZSBzaXplIG9mIHRoZSBiYXRjaCBydW4uIE1DIG11c3QgZGVjaWRlIHdoZXRoZXIgdG8gbWFudWZhY3R1cmUgYWxsIDIwMCwwMDAgUEMgYm9hcmRzIG5vdyBvcgp3aGV0aGVyIHRvIG9ubHkgbWFudWZhY3R1cmUgMTAwLDAwMCBub3cgYW5kIG1hbnVmYWN0dXJlIHRoZSBvdGhlciAxMDAsMDAwIGJvYXJkcyBvbmx5IGlmIERJU0NPIGV4ZXJjaXNlcyBpdHMKb3B0aW9uIHRvIGJ1eSB0aG9zZSBib2FyZHMuIElmIE1DIG1hbnVmYWN0dXJlcyAyMDAsMDAwIG5vdyBhbmQgRElTQ08gZG9lcyBub3QgZXhlcmNpc2UgaXRzIG9wdGlvbiwgdGhlbiB0aGUKbWFudWZhY3R1cmluZyBjb3N0IG9mIHRoZSBleHRyYSAxMDAsMDAwIGJvYXJkcyB3aWxsIGJlIHRvdGFsbHkgbG9zdC4gTUMgYmVsaWV2ZXMgdGhlcmUgaXMgYSA1MCUgY2hhbmNlIERJU0NPCndpbGwgZXhlcmNpc2UgaXRzIG9wdGlvbiB0byBidXkgdGhlIGFkZGl0aW9uYWwgMTAwLDAwMCBQQyBib2FyZHMuCgojIyBUaGUgZGVjaXNpb24gdHJlZQoKLSAgRHJhdyBhIGRlY2lzaW9uIHRyZWUgZm9yIHRoZSBkZWNpc2lvbiB0aGF0IE1DIGZhY2VzLgoKYGBge3IgbG9hZGluZywgbWVzc2FnZT1GQUxTRX0KbGlicmFyeSh5YW1sKQpsaWJyYXJ5KHJhZGlhbnQpCmxpYnJhcnkocmFkaWFudC5tb2RlbCkKYGBgCgpgYGB7ciBTb2x1dGlvbiBUcmVlfQp0cmVlID0geWFtbC5sb2FkX2ZpbGUoaW5wdXQgPSAiLi9Cb2FyZF9Qcm9kdWN0aW9uLnlhbWwiKQoKcmVzdWx0ID1kdHJlZSh5bCA9IHRyZWUpCnBsb3QocmVzdWx0LCBmaW5hbCA9IEZBTFNFKQpgYGAKCgojIyBFeHBlY3RlZCB2YWx1ZQotICBEZXRlcm1pbmUgdGhlIHByZWZlcnJlZCBjb3Vyc2Ugb2YgYWN0aW9uIGZvciBNQyBhc3N1bWluZyBpdCB1c2VzIGV4cGVjdGVkIHByb2ZpdCBhcyBpdHMgZGVjaXNpb24gY3JpdGVyaW9uLgoKYGBge3IgRXhwZWN0ZWQgVmFsdWV9CnN1bW1hcnkocmVzdWx0LCBpbnB1dCA9IEZBTFNFLCBvdXRwdXQgPSBUUlVFKQoKcGxvdChyZXN1bHQsIGZpbmFsID0gVFJVRSkKYGBgCgojIyBVdGlsaXR5IEZ1bmN0aW9uIGFuZCBDZXJ0YWludHkgRXF1aXZhbGVudAoKQXNzdW1lIHRoYXQgYWxsIHRoZSBpbmZvcm1hdGlvbiBzdGlsbCBob2xkcywgZXhjZXB0IGFzc3VtZSBub3cgdGhhdCBNQyBoYXMgYW4gZXhwb25lbnRpYWwgdXRpbGl0eSBmdW5jdGlvbiB3aXRoIGEgcmlzayB0b2xlcmFuY2Ugb2YgJDEwMCwwMDAuCgpgYGB7ciBEZWZpbmUgVXRpbGl0eSBGdW5jdGlvbnN9CnV0aWxpdHlGdW5jdGlvbkV4cCA8LSBmdW5jdGlvbihYLCBSKSB7CnJlcyA8LSAxLSBleHAoLVgvUikKcmV0dXJuKHJlcykKfQoKQ2VydEVxdWl2YWxlbnQgPSBmdW5jdGlvbihFVSwgUil7CkNFID0gLVIqbG4oMS1FVSkKcmV0dXJuKENFKQp9CgpDYWxjRXhwZWN0ZWRVdGlsaXR5RnVuY3Rpb24gPSBmdW5jdGlvbihwcm9maXQsIFIpewogICMtLS0tLS1CcmFuY2ggMS0tLS0tLS0tLS0jCiAgVUYxID0gdXRpbGl0eUZ1bmN0aW9uRXhwKHByb2ZpdCRwcm9maXRCcmFuY2gxLCBSKQogIFVGMV9BID0gVUYxWzFdKjAuNSArIFVGMVsyXSowLjUKCiAgIy0tLS0tQnJhbmNoIDItLS0tLS0tLS0tIwogIFVGMiA9IHV0aWxpdHlGdW5jdGlvbkV4cChwcm9maXQkcHJvZml0QnJhbmNoMiwgUikKICBVRjJfQSA9IFVGMlsxXSowLjUgKyBVRjJbMl0qMC41CiAgCiAgIy0tLS1SZXR1cm4gRmluYWwgUmVzdWx0LS0tLSMKICByZXR1cm4oYyhVRjFfQSwgVUYyX0EpKQp9CgpDYWxjQnJhbmNoQ0UgPSBmdW5jdGlvbihwcm9maXQsIFIpewpDRV92ZXR0ID0gQ2VydEVxdWl2YWxlbnQoQ2FsY0V4cGVjdGVkVXRpbGl0eUZ1bmN0aW9uKHByb2ZpdCwgUiksIFIpCnJldHVybihDRV92ZXR0KQp9CgojQ3JlYXRlIGEgRGF0YUZyYW1lIHdpdGggUHJvZml0cyBwZXIgQnJhbmNoCgppbmRleCA8LSAxOjIKcHJvZml0QnJhbmNoMSA8LSBjKDM1LC0xNSkKcHJvZml0QnJhbmNoMiA8LSBjKDEwLDUpCnByb2ZpdCA8LSBkYXRhLmZyYW1lKCJYIj1pbmRleCwicHJvZml0QnJhbmNoMSI9cHJvZml0QnJhbmNoMSwicHJvZml0QnJhbmNoMiI9cHJvZml0QnJhbmNoMikKUj0xMAoKQ0UgPC0gQ2FsY0JyYW5jaENFKHByb2ZpdCxSKQoKQ0VfQnJhbmNoMSA8LSBDRVsxXQpDRV9CcmFuY2gyIDwtIENFWzJdCgppZiAoQ0VfQnJhbmNoMj5DRV9CcmFuY2gxKQogIHByaW50KCJUaGUgb3B0aW1hbCBjaG9pc2UgaXMgdGhlIHNlY29uZCBCcmFuY2giKSBlbHNlCiAgcHJpbnQoIlRoZSBvcHRpbWFsIGNob2lzZSBpcyB0aGUgZmlyc3QgQnJhbmNoIikKCgoKYGBgCi0gRGV0ZXJtaW5lIE1DJ3MgcHJlZmVycmVkIGNvdXJzZSBvZiBhY3Rpb24uCgojIyBNb2RpZmljYXRpb24gb2YgdGhlIHByb2Nlc3MKCkZvciB0aGUgZGVjaXNpb24gaW4gdGhlIHByZWNlZGluZyBwb2ludCwgTUMgTWFudWZhY3R1cmluZyBoYXMgY3JlYXRlZCBhIG5ldyBvcHRpb246IGl0IGNhbiBjb25kdWN0IHNvbWUgcmVzZWFyY2ggYW5kIGRldmVsb3BtZW50IGluIGFuIGF0dGVtcHQgdG8gbG93ZXIgdGhlIGZpeGVkIHNldHVwIGNvc3QgYXNzb2NpYXRlZCB3aXRoIG1hbnVmYWN0dXJpbmcgYSBiYXRjaCBvZiB0aGUgUEMgYm9hcmRzLiBUaGlzIHJlc2VhcmNoIGFuZCBkZXZlbG9wbWVudCB3b3VsZCBub3QgYmUgY29tcGxldGVkIGluIHRpbWUgdG8gaW5mbHVlbmNlIHRoZSBzZXR1cCBjb3N0IGZvciB0aGUgaW5pdGlhbCBiYXRjaCB0aGF0IERJU0NPIGhhcyBvcmRlcmVkLCBidXQgd291bGQgYmUgY29tcGxldGVkIGJlZm9yZSB0aGUgc2Vjb25kIGJhdGNoIHdvdWxkIGhhdmUgdG8gYmUgbWFudWZhY3R1cmVkLiBUaGUgcmVzZWFyY2ggYW5kIGRldmVsb3BtZW50IHdpbGwgY29zdCAkMjUsMDAwLCBhbmQgdGhlcmUgaXMgYSAwLjQgcHJvYmFiaWxpdHkgdGhhdCBpdCB3aWxsIGJlIHN1Y2Nlc3NmdWwuIElmIGl0IGlzIHN1Y2Nlc3NmdWwsIHRoZW4gdGhlIGZpeGVkIHNldHVwIGNvc3QgcGVyIGJhdGNoIHdpbGwgYmUgcmVkdWNlZCBieSAkMjAwLDAwMCB0byAkNTAsMDAwLiBJZiB0aGUgcmVzZWFyY2ggYW5kIGRldmVsb3BtZW50IGlzIG5vdCBzdWNjZXNzZnVsLCB0aGVuIHRoZXJlIHdpbGwgYmUgbm8gcmVkdWN0aW9uIGluIHRoZSBzZXR1cCBjb3N0LiBUaGVyZSB3aWxsIGJlIG5vIG90aGVyIGJlbmVmaXRzIGZyb20gdGhlIHJlc2VhcmNoIGFuZCBkZXZlbG9wbWVudCBiZXNpZGVzIHRoZSBwb3RlbnRpYWwgcmVkdWN0aW9uIGluIHNldHVwIGNvc3QgZm9yIHRoZSBESVNDTyByZW9yZGVyLgoKLSBVc2luZyBleHBlY3RlZCBwcm9maXQgYXMgdGhlIGRlY2lzaW9uIGNyaXRlcmlvbiwgZGV0ZXJtaW5lIHdoZXRoZXIgTUMgc2hvdWxkIHVuZGVydGFrZSB0aGUgcmVzZWFyY2ggYW5kIGRldmVsb3BtZW50LgoKIyMgVmFsdWUgb2YgSW5mb3JtYXRpb24KClVzaW5nIGV4cGVjdGVkIHByb2ZpdCBhcyB0aGUgZGVjaXNpb24gY3JpdGVyaWEsIGRldGVybWluZSB0aGUgdmFsdWUgb2YgbGVhcm5pbmcgZm9yIGNlcnRhaW4gd2hldGhlciB0aGUgcmVzZWFyY2ggYW5kIGRldmVsb3BtZW50IHdpbGwgYmUgc3VjY2Vzc2Z1bCBiZWZvcmUgYSBkZWNpc2lvbiBoYXMgdG8gYmUgbWFkZSBhYm91dCB3aGV0aGVyIHRvIGluaXRpYWxseSBtYW51ZmFjdHVyZSAxMDAsMDAwIG9yIDIwMCwwMDAgUEMgYm9hcmRzLgoKCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAnQXNzaWdubWVudCAxOiBQcmludGVkIGNpcmN1aXRzJwphdXRob3I6ICJudWxsIgpkYXRlOiAiMTgtMDMtMjAxOSIKb3V0cHV0OiAKICAjcGRmX2RvY3VtZW50OiAKICAjICBkZl9wcmludDogcGFnZWQKICAjICBoaWdobGlnaHQ6IHRhbmdvIAogICMgIHRvYzogeWVzCiAgIyAgdG9jX2RlcHRoOiA1CiAgaHRtbF9kb2N1bWVudDoKICAgIGNvZGVfZG93bmxvYWQ6IHllcwogICAgZGZfcHJpbnQ6IHBhZ2VkCiAgICBoaWdobGlnaHQ6IHRleHRtYXRlCiAgICB0aGVtZTogc3BhY2VsYWIKICAgIHRvYzogeWVzCiAgICB0b2NfZGVwdGg6IDUKICAjaHRtbF9ub3RlYm9vazoKICAjICBkZl9wcmludDogcGFnZWQKICAjICBoaWdobGlnaHQ6IHRleHRtYXRlCiAgIyAgdGhlbWU6IHNwYWNlbGFiCiAgIyAgdG9jOiB5ZXMKICAjICB0b2NfZGVwdGg6IDUKLS0tCgpgYGB7ciByX3NldHVwLCBpbmNsdWRlID0gRkFMU0V9CiMjIGluaXRpYWwgc2V0dGluZ3MKa25pdHI6Om9wdHNfY2h1bmskc2V0KAogIGNvbW1lbnQgPSBOQSwKICBlY2hvID0gVFJVRSwKICBlcnJvciA9IFRSVUUsCiAgY2FjaGUgPSBGQUxTRSwKICBtZXNzYWdlID0gRkFMU0UsCiAgZHBpID0gMjAwLAogIHdhcm5pbmcgPSBGQUxTRQopCgojIyB3aWR0aCB0byB1c2Ugd2hlbiBwcmludGluZyB0YWJsZXMgZXRjLgpvcHRpb25zKAogIHdpZHRoID0gMjUwLAogIHNjaXBlbiA9IDEwMCwKICBtYXgucHJpbnQgPSA1MDAwLAogIHN0cmluZ3NBc0ZhY3RvcnMgPSBGQUxTRQopCmBgYAoKPHN0eWxlPgoudGFibGUgewogIHdpZHRoOiBhdXRvOwp9CnVsLCBvbCB7CiAgcGFkZGluZy1sZWZ0OiAxOHB4Owp9CnByZSwgY29kZSwgcHJlIGNvZGUgewogIG92ZXJmbG93OiBhdXRvOwogIHdoaXRlLXNwYWNlOiBwcmU7CiAgd29yZC13cmFwOiBub3JtYWw7CiAgYmFja2dyb3VuZC1jb2xvcjogI2ZmZmZmZjsKfQo8L3N0eWxlPgoKIyMgSW50cm9kdWN0aW9uCipNQyBNYW51ZmFjdHVyaW5nKiBoYXMgY29udHJhY3RlZCB0byBwcm92aWRlICpESVNDTyBFbGVjdHJvbmljcyogd2l0aCBwcmludGVkIGNpcmN1aXQgKCJQQyIpIGJvYXJkcyB1bmRlcgp0aGUgZm9sbG93aW5nIHRlcm1zOiAoMSkgMTAwLDAwMCBQQyBib2FyZHMgd2lsbCBiZSBkZWxpdmVyZWQgdG8gRElTQ08gaW4gb25lIG1vbnRoLCBhbmQgKDIpIERJU0NPIGhhcyBhbgpvcHRpb24gdG8gdGFrZSBkZWxpdmVyeSBvZiBhbiBhZGRpdGlvbmFsIDEwMCwwMDAgYm9hcmRzIGluIHRocmVlIG1vbnRocyBieSBnaXZpbmcgQWJhIDMwIGRheXMgbm90aWNlLiBESVNDTwp3aWxsIHBheSAkNS4wMCBmb3IgZWFjaCBib2FyZCB0aGF0IGl0IHB1cmNoYXNlcy4gTUMgbWFudWZhY3R1cmVzIHRoZSBQQyBib2FyZHMgdXNpbmcgYSBiYXRjaCBwcm9jZXNzLCBhbmQKbWFudWZhY3R1cmluZyBjb3N0cyBhcmUgYXMgZm9sbG93czogKDEpIHRoZXJlIGlzIGEgZml4ZWQgc2V0dXAgY29zdCBvZiAkMjUwLDAwMCBmb3IgYW55IG1hbnVmYWN0dXJpbmcgYmF0Y2gKcnVuLCByZWdhcmRsZXNzIG9mIHRoZSBzaXplIG9mIHRoZSBydW4sIGFuZCAoMikgdGhlcmUgaXMgYSBtYXJnaW5hbCAgbWFudWZhY3R1cmluZyBjb3N0IG9mICQyLjAwIHBlciBib2FyZApyZWdhcmRsZXNzIG9mIHRoZSBzaXplIG9mIHRoZSBiYXRjaCBydW4uIE1DIG11c3QgZGVjaWRlIHdoZXRoZXIgdG8gbWFudWZhY3R1cmUgYWxsIDIwMCwwMDAgUEMgYm9hcmRzIG5vdyBvcgp3aGV0aGVyIHRvIG9ubHkgbWFudWZhY3R1cmUgMTAwLDAwMCBub3cgYW5kIG1hbnVmYWN0dXJlIHRoZSBvdGhlciAxMDAsMDAwIGJvYXJkcyBvbmx5IGlmIERJU0NPIGV4ZXJjaXNlcyBpdHMKb3B0aW9uIHRvIGJ1eSB0aG9zZSBib2FyZHMuIElmIE1DIG1hbnVmYWN0dXJlcyAyMDAsMDAwIG5vdyBhbmQgRElTQ08gZG9lcyBub3QgZXhlcmNpc2UgaXRzIG9wdGlvbiwgdGhlbiB0aGUKbWFudWZhY3R1cmluZyBjb3N0IG9mIHRoZSBleHRyYSAxMDAsMDAwIGJvYXJkcyB3aWxsIGJlIHRvdGFsbHkgbG9zdC4gTUMgYmVsaWV2ZXMgdGhlcmUgaXMgYSA1MCUgY2hhbmNlIERJU0NPCndpbGwgZXhlcmNpc2UgaXRzIG9wdGlvbiB0byBidXkgdGhlIGFkZGl0aW9uYWwgMTAwLDAwMCBQQyBib2FyZHMuCgojIyBUaGUgZGVjaXNpb24gdHJlZQoKLSAgRHJhdyBhIGRlY2lzaW9uIHRyZWUgZm9yIHRoZSBkZWNpc2lvbiB0aGF0IE1DIGZhY2VzLgoKYGBge3IgbG9hZGluZywgbWVzc2FnZT1GQUxTRX0KbGlicmFyeSh5YW1sKQpsaWJyYXJ5KHJhZGlhbnQpCmxpYnJhcnkocmFkaWFudC5tb2RlbCkKYGBgCgpgYGB7ciBTb2x1dGlvbiBUcmVlfQpzZXR3ZCgiL2hvbWUvcHJhbmF2L0Rlc2t0b3AvRGVjaXNpb24gTW9kZWxzIEFzc2lnbm1lbnRzL0Fzc2lnbm1lbnQgMS8iKQp0cmVlID0geWFtbC5sb2FkX2ZpbGUoaW5wdXQgPSAiLi9Cb2FyZF9Qcm9kdWN0aW9uLnlhbWwiKQoKcmVzdWx0ID1kdHJlZSh5bCA9IHRyZWUpCnBsb3QocmVzdWx0LCBmaW5hbCA9IEZBTFNFKQpgYGAKCgojIyBFeHBlY3RlZCB2YWx1ZQotICBEZXRlcm1pbmUgdGhlIHByZWZlcnJlZCBjb3Vyc2Ugb2YgYWN0aW9uIGZvciBNQyBhc3N1bWluZyBpdCB1c2VzIGV4cGVjdGVkIHByb2ZpdCBhcyBpdHMgZGVjaXNpb24gY3JpdGVyaW9uLgoKYGBge3IgRXhwZWN0ZWQgVmFsdWV9CnN1bW1hcnkocmVzdWx0LCBpbnB1dCA9IEZBTFNFLCBvdXRwdXQgPSBUUlVFKQoKcGxvdChyZXN1bHQsIGZpbmFsID0gVFJVRSkKYGBgCgojIyBVdGlsaXR5IEZ1bmN0aW9uIGFuZCBDZXJ0YWludHkgRXF1aXZhbGVudAoKQXNzdW1lIHRoYXQgYWxsIHRoZSBpbmZvcm1hdGlvbiBzdGlsbCBob2xkcywgZXhjZXB0IGFzc3VtZSBub3cgdGhhdCBNQyBoYXMgYW4gZXhwb25lbnRpYWwgdXRpbGl0eSBmdW5jdGlvbiB3aXRoIGEgcmlzayB0b2xlcmFuY2Ugb2YgJDEwMCwwMDAuCgpgYGB7ciBEZWZpbmUgVXRpbGl0eSBGdW5jdGlvbnN9CnV0aWxpdHlGdW5jdGlvbkV4cCA8LSBmdW5jdGlvbihYLCBSKSB7CnJlcyA8LSAxLSBleHAoLVgvUikKcmV0dXJuKHJlcykKfQoKQ2VydEVxdWl2YWxlbnQgPSBmdW5jdGlvbihFVSwgUil7CkNFID0gLVIqbG4oMS1FVSkKcmV0dXJuKENFKQp9CgpDYWxjRXhwZWN0ZWRVdGlsaXR5RnVuY3Rpb24gPSBmdW5jdGlvbihwcm9maXQsIFIpewogICMtLS0tLS1CcmFuY2ggMS0tLS0tLS0tLS0jCiAgVUYxID0gdXRpbGl0eUZ1bmN0aW9uRXhwKHByb2ZpdCRwcm9maXRCcmFuY2gxLCBSKQogIFVGMV9BID0gVUYxWzFdKjAuNSArIFVGMVsyXSowLjUKCiAgIy0tLS0tQnJhbmNoIDItLS0tLS0tLS0tIwogIFVGMiA9IHV0aWxpdHlGdW5jdGlvbkV4cChwcm9maXQkcHJvZml0QnJhbmNoMiwgUikKICBVRjJfQSA9IFVGMlsxXSowLjUgKyBVRjJbMl0qMC41CiAgCiAgIy0tLS1SZXR1cm4gRmluYWwgUmVzdWx0LS0tLSMKICByZXR1cm4oYyhVRjFfQSwgVUYyX0EpKQp9CgpDYWxjQnJhbmNoQ0UgPSBmdW5jdGlvbihwcm9maXQsIFIpewpDRV92ZXR0ID0gQ2VydEVxdWl2YWxlbnQoQ2FsY0V4cGVjdGVkVXRpbGl0eUZ1bmN0aW9uKHByb2ZpdCwgUiksIFIpCnJldHVybihDRV92ZXR0KQp9CgojQ3JlYXRlIGEgRGF0YUZyYW1lIHdpdGggUHJvZml0cyBwZXIgQnJhbmNoCgppbmRleCA8LSAxOjIKcHJvZml0QnJhbmNoMSA8LSBjKDM1LC0xNSkKcHJvZml0QnJhbmNoMiA8LSBjKDEwLDUpCnByb2ZpdCA8LSBkYXRhLmZyYW1lKCJYIj1pbmRleCwicHJvZml0QnJhbmNoMSI9cHJvZml0QnJhbmNoMSwicHJvZml0QnJhbmNoMiI9cHJvZml0QnJhbmNoMikKUj0xMAoKQ0UgPC0gQ2FsY0JyYW5jaENFKHByb2ZpdCxSKQoKQ0VfQnJhbmNoMSA8LSBDRVsxXQpDRV9CcmFuY2gyIDwtIENFWzJdCmBgYAotIERldGVybWluZSBNQydzIHByZWZlcnJlZCBjb3Vyc2Ugb2YgYWN0aW9uLgoKIyMgTW9kaWZpY2F0aW9uIG9mIHRoZSBwcm9jZXNzCgpGb3IgdGhlIGRlY2lzaW9uIGluIHRoZSBwcmVjZWRpbmcgcG9pbnQsIE1DIE1hbnVmYWN0dXJpbmcgaGFzIGNyZWF0ZWQgYSBuZXcgb3B0aW9uOiBpdCBjYW4gY29uZHVjdCBzb21lIHJlc2VhcmNoIGFuZCBkZXZlbG9wbWVudCBpbiBhbiBhdHRlbXB0IHRvIGxvd2VyIHRoZSBmaXhlZCBzZXR1cCBjb3N0IGFzc29jaWF0ZWQgd2l0aCBtYW51ZmFjdHVyaW5nIGEgYmF0Y2ggb2YgdGhlIFBDIGJvYXJkcy4gVGhpcyByZXNlYXJjaCBhbmQgZGV2ZWxvcG1lbnQgd291bGQgbm90IGJlIGNvbXBsZXRlZCBpbiB0aW1lIHRvIGluZmx1ZW5jZSB0aGUgc2V0dXAgY29zdCBmb3IgdGhlIGluaXRpYWwgYmF0Y2ggdGhhdCBESVNDTyBoYXMgb3JkZXJlZCwgYnV0IHdvdWxkIGJlIGNvbXBsZXRlZCBiZWZvcmUgdGhlIHNlY29uZCBiYXRjaCB3b3VsZCBoYXZlIHRvIGJlIG1hbnVmYWN0dXJlZC4gVGhlIHJlc2VhcmNoIGFuZCBkZXZlbG9wbWVudCB3aWxsIGNvc3QgJDI1LDAwMCwgYW5kIHRoZXJlIGlzIGEgMC40IHByb2JhYmlsaXR5IHRoYXQgaXQgd2lsbCBiZSBzdWNjZXNzZnVsLiBJZiBpdCBpcyBzdWNjZXNzZnVsLCB0aGVuIHRoZSBmaXhlZCBzZXR1cCBjb3N0IHBlciBiYXRjaCB3aWxsIGJlIHJlZHVjZWQgYnkgJDIwMCwwMDAgdG8gJDUwLDAwMC4gSWYgdGhlIHJlc2VhcmNoIGFuZCBkZXZlbG9wbWVudCBpcyBub3Qgc3VjY2Vzc2Z1bCwgdGhlbiB0aGVyZSB3aWxsIGJlIG5vIHJlZHVjdGlvbiBpbiB0aGUgc2V0dXAgY29zdC4gVGhlcmUgd2lsbCBiZSBubyBvdGhlciBiZW5lZml0cyBmcm9tIHRoZSByZXNlYXJjaCBhbmQgZGV2ZWxvcG1lbnQgYmVzaWRlcyB0aGUgcG90ZW50aWFsIHJlZHVjdGlvbiBpbiBzZXR1cCBjb3N0IGZvciB0aGUgRElTQ08gcmVvcmRlci4KCi0gVXNpbmcgZXhwZWN0ZWQgcHJvZml0IGFzIHRoZSBkZWNpc2lvbiBjcml0ZXJpb24sIGRldGVybWluZSB3aGV0aGVyIE1DIHNob3VsZCB1bmRlcnRha2UgdGhlIHJlc2VhcmNoIGFuZCBkZXZlbG9wbWVudC4KCmBgYHtyIE1vZGlmaWNhdGlvbn0KdHJlZV9SbkQgPSB5YW1sLmxvYWRfZmlsZShpbnB1dCA9ICIuL0JvYXJkX1Byb2R1Y3Rpb25fUm5ELnlhbWwiKQpyZXN1bHRfUm5EID0gZHRyZWUoeWwgPSB0cmVlX1JuRCkKCnBsb3QocmVzdWx0X1JuRCwgZmluYWw9RkFMU0UpCgpzdW1tYXJ5KHJlc3VsdF9SbkQsIGlucHV0ID0gRkFMU0UsIG91dHB1dCA9IFRSVUUpCgpwbG90KHJlc3VsdF9SbkQsIGZpbmFsID0gVFJVRSkKYGBgCgojIyBWYWx1ZSBvZiBJbmZvcm1hdGlvbgoKVXNpbmcgZXhwZWN0ZWQgcHJvZml0IGFzIHRoZSBkZWNpc2lvbiBjcml0ZXJpYSwgZGV0ZXJtaW5lIHRoZSB2YWx1ZSBvZiBsZWFybmluZyBmb3IgY2VydGFpbiB3aGV0aGVyIHRoZSByZXNlYXJjaCBhbmQgZGV2ZWxvcG1lbnQgd2lsbCBiZSBzdWNjZXNzZnVsIGJlZm9yZSBhIGRlY2lzaW9uIGhhcyB0byBiZSBtYWRlIGFib3V0IHdoZXRoZXIgdG8gaW5pdGlhbGx5IG1hbnVmYWN0dXJlIDEwMCwwMDAgb3IgMjAwLDAwMCBQQyBib2FyZHMuCgoK</div>
 
 
 

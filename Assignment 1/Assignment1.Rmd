@@ -83,6 +83,7 @@ library(radiant.model)
 ```
 
 ```{r Solution Tree}
+setwd("/home/pranav/Desktop/Decision Models Assignments/Assignment 1/")
 tree = yaml.load_file(input = "./Board_Production.yaml")
 
 result =dtree(yl = tree)
@@ -152,6 +153,17 @@ CE_Branch2 <- CE[2]
 For the decision in the preceding point, MC Manufacturing has created a new option: it can conduct some research and development in an attempt to lower the fixed setup cost associated with manufacturing a batch of the PC boards. This research and development would not be completed in time to influence the setup cost for the initial batch that DISCO has ordered, but would be completed before the second batch would have to be manufactured. The research and development will cost $25,000, and there is a 0.4 probability that it will be successful. If it is successful, then the fixed setup cost per batch will be reduced by $200,000 to $50,000. If the research and development is not successful, then there will be no reduction in the setup cost. There will be no other benefits from the research and development besides the potential reduction in setup cost for the DISCO reorder.
 
 - Using expected profit as the decision criterion, determine whether MC should undertake the research and development.
+
+```{r Modification}
+tree_RnD = yaml.load_file(input = "./Board_Production_RnD.yaml")
+result_RnD = dtree(yl = tree_RnD)
+
+plot(result_RnD, final=FALSE)
+
+summary(result_RnD, input = FALSE, output = TRUE)
+
+plot(result_RnD, final = TRUE)
+```
 
 ## Value of Information
 

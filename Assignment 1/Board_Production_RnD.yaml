@@ -1,0 +1,72 @@
+name: Board Production Decision RnD
+variables:
+    setup_cost: 25
+    manifacture_cost: 20
+    research_cost: 2.5
+    manifacture_RnD_cost: 5
+    unit_revenue: 50
+
+    prob_extra: 0.5
+    prob_not_extra: 1-prob_extra
+    prob_RnD_success: 0.4
+    prob_RnD_fail: 1 - prob_RnD_success
+
+    cost_toghether_extra: setup_cost + 2 * manifacture_cost
+    cost_toghether_not_extra: setup_cost + 2 * manifacture_cost
+    cost_not_together_extra: 2 * setup_cost + 2 * manifacture_cost
+    cost_not_together_not_extra: setup_cost + manifacture_cost
+
+    revenue_extra: 2 * unit_revenue
+    revenue_not_extra: unit_revenue
+
+    payoff_toghether_extra: revenue_extra - cost_toghether_extra
+    payoff_toghether_not_extra: revenue_not_extra - cost_toghether_not_extra
+    payoff_not_toghether_extra: revenue_extra - cost_not_together_extra
+    payoff_not_toghether_not_extra: revenue_not_extra - cost_not_together_not_extra
+
+    cost_RnD_success_extra: setup_cost + 2 * manifacture_cost + research_cost + manifacture_RnD_cost
+    cost_RnD_success_not_extra: setup_cost + manifacture_cost + research_cost
+    cost_RnD_fail_extra: 2 * setup_cost + 2 * manifacture_cost + research_cost
+    cost_RnD_fail_not_extra: setup_cost + manifacture_cost + research_cost
+
+    payoff_RnD_success_extra: revenue_extra - cost_RnD_success_extra
+    payoff_RnD_success_not_extra: revenue_not_extra - cost_RnD_success_not_extra
+    payoff_RnD_fail_extra: revenue_extra - cost_RnD_fail_extra
+    payoff_RnD_fail_not_extra: revenue_not_extra - cost_RnD_fail_not_extra
+type: decision
+Produce Everything:
+    type: chance
+    Extra Quantity:
+        p: prob_extra
+        payoff: payoff_toghether_extra
+    No Extra Quantity:
+        p: prob_not_extra
+        payoff: payoff_toghether_not_extra
+Don't Produce Everything:
+    type: chance
+    Extra Quantity:
+        p: prob_extra
+        payoff: payoff_not_toghether_extra
+    No Extra Quantity:
+        p: prob_not_extra
+        payoff: payoff_not_toghether_not_extra
+Research & Development:
+    type: chance
+    R&D Success:
+      p: prob_RnD_success
+      type: chance
+      Extra Quantity:
+        p: prob_extra
+        payoff: payoff_RnD_success_extra
+      No Extra Quantity:
+        p: prob_not_extra
+        payoff: payoff_RnD_success_not_extra
+    R&D Failure:
+      p: prob_RnD_fail
+      type: chance
+      Extra Quantity:
+        p: prob_extra
+        payoff: payoff_RnD_fail_extra
+      No Extra Quantity:
+        p: prob_not_extra
+        payoff: payoff_RnD_fail_not_extra
