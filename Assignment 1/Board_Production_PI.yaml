@@ -1,0 +1,74 @@
+name: Board Production Decision RnD
+variables:
+    setup_cost: 25
+    manifacture_cost: 20
+    setup_RnD_cost: 5
+    research_cost: 2.5
+    unit_revenue: 50
+
+    prob_extra: 0.5
+    prob_not_extra: 1-prob_extra
+    prob_RnD_success: 0.4
+    prob_RnD_fail: 1 - prob_RnD_success
+
+    revenue_extra: 2 * unit_revenue
+    revenue_not_extra: unit_revenue
+
+    cost_success_toghether_extra: 2 * manifacture_cost + research_cost + setup_cost
+    cost_success_toghether_not_extra: 2 * manifacture_cost + research_cost + setup_cost
+    cost_success_not_toghether_extra: 2 * manifacture_cost + research_cost + setup_RnD_cost + setup_cost
+    cost_success_not_toghether_not_extra: manifacture_cost + research_cost + setup_cost
+
+    payoff_success_toghether_extra: revenue_extra - cost_success_toghether_extra
+    payoff_success_toghether_not_extra: revenue_not_extra - cost_success_toghether_not_extra
+    payoff_success_not_toghether_extra: revenue_extra - cost_success_not_toghether_extra
+    payoff_success_not_toghether_not_extra: revenue_not_extra - cost_success_not_toghether_not_extra
+
+    cost_fail_toghether_extra: 2 * manifacture_cost + setup_cost
+    cost_fail_toghether_not_extra: 2 * manifacture_cost + setup_cost
+    cost_fail_not_toghether_extra: 2 * manifacture_cost + 2 * setup_cost
+    cost_fail_not_toghether_not_extra: manifacture_cost + setup_cost
+
+    payoff_fail_toghether_extra: revenue_extra - cost_fail_toghether_extra
+    payoff_fail_toghether_not_extra: revenue_not_extra - cost_fail_toghether_not_extra
+    payoff_fail_not_toghether_extra: revenue_extra - cost_fail_not_toghether_extra
+    payoff_fail_not_toghether_not_extra: revenue_not_extra - cost_fail_not_toghether_not_extra
+type: chance
+R&D Success:
+  p: prob_RnD_success
+  type: decision
+  Produce Everything:
+    type: chance
+    Extra Quantity:
+        p: prob_extra
+        payoff: payoff_success_toghether_extra
+    No Extra Quantity:
+        p: prob_not_extra
+        payoff: payoff_success_toghether_not_extra
+  Don't Produce Everything:
+    type: chance
+    Extra Quantity:
+        p: prob_extra
+        payoff: payoff_success_not_toghether_extra
+    No Extra Quantity:
+        p: prob_not_extra
+        payoff: payoff_success_not_toghether_not_extra
+R&D Failure:
+  p: prob_RnD_fail
+  type: decision
+  Produce Everything:
+    type: chance
+    Extra Quantity:
+        p: prob_extra
+        payoff: payoff_fail_toghether_extra
+    No Extra Quantity:
+        p: prob_not_extra
+        payoff: payoff_fail_toghether_not_extra
+  Don't Produce Everything:
+    type: chance
+    Extra Quantity:
+        p: prob_extra
+        payoff: payoff_fail_not_toghether_extra
+    No Extra Quantity:
+        p: prob_not_extra
+        payoff: payoff_fail_not_toghether_not_extra

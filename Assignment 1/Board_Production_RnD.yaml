@@ -1,9 +1,9 @@
 name: Board Production Decision RnD
 variables:
     setup_cost: 25
-    manifacture_cost: 20
+    manufacture_cost: 20
     research_cost: 2.5
-    manifacture_RnD_cost: 5
+    setup_RnD_cost: 5
     unit_revenue: 50
 
     prob_extra: 0.5
@@ -11,10 +11,10 @@ variables:
     prob_RnD_success: 0.4
     prob_RnD_fail: 1 - prob_RnD_success
 
-    cost_toghether_extra: setup_cost + 2 * manifacture_cost
-    cost_toghether_not_extra: setup_cost + 2 * manifacture_cost
-    cost_not_together_extra: 2 * setup_cost + 2 * manifacture_cost
-    cost_not_together_not_extra: setup_cost + manifacture_cost
+    cost_toghether_extra: setup_cost + 2 * manufacture_cost
+    cost_toghether_not_extra: setup_cost + 2 * manufacture_cost
+    cost_not_together_extra: 2 * setup_cost + 2 * manufacture_cost
+    cost_not_together_not_extra: setup_cost + manufacture_cost
 
     revenue_extra: 2 * unit_revenue
     revenue_not_extra: unit_revenue
@@ -24,10 +24,10 @@ variables:
     payoff_not_toghether_extra: revenue_extra - cost_not_together_extra
     payoff_not_toghether_not_extra: revenue_not_extra - cost_not_together_not_extra
 
-    cost_RnD_success_extra: setup_cost + 2 * manifacture_cost + research_cost + manifacture_RnD_cost
-    cost_RnD_success_not_extra: setup_cost + manifacture_cost + research_cost
-    cost_RnD_fail_extra: 2 * setup_cost + 2 * manifacture_cost + research_cost
-    cost_RnD_fail_not_extra: setup_cost + manifacture_cost + research_cost
+    cost_RnD_success_extra: setup_cost + 2 * manufacture_cost + research_cost + setup_RnD_cost
+    cost_RnD_success_not_extra: setup_cost + manufacture_cost + research_cost
+    cost_RnD_fail_extra: 2 * setup_cost + 2 * manufacture_cost + research_cost
+    cost_RnD_fail_not_extra: setup_cost + manufacture_cost + research_cost
 
     payoff_RnD_success_extra: revenue_extra - cost_RnD_success_extra
     payoff_RnD_success_not_extra: revenue_not_extra - cost_RnD_success_not_extra

@@ -1,14 +1,14 @@
 name: Board Production Decision
 variables:
     setup cost: 25
-    manifacture cost: 20
+    manufacture cost: 20
     unit_revenue: 50
     prob_extra: 0.5
     prob_not_extra: 1-prob_extra
-    cost_toghether_extra: setup cost + 2 * manifacture cost
-    cost_toghether_not_extra: setup cost + 2 * manifacture cost
-    cost_not_together_extra: 2 * setup cost + 2 * manifacture cost
-    cost_not_together_not_extra: setup cost + manifacture cost
+    cost_toghether_extra: setup cost + 2 * manufacture cost
+    cost_toghether_not_extra: setup cost + 2 * manufacture cost
+    cost_not_together_extra: 2 * setup cost + 2 * manufacture cost
+    cost_not_together_not_extra: setup cost + manufacture cost
     revenue_extra: 2 * unit_revenue
     revenue_not_extra: unit_revenue
     payoff_toghether_extra: revenue_extra - cost_toghether_extra

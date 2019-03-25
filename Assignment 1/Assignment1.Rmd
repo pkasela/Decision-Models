@@ -1,6 +1,6 @@
 ---
 title: 'Assignment 1: Printed circuits'
-author: "null"
+author: "Pranav Kasela"
 date: "18-03-2019"
 output: 
   #pdf_document: 
@@ -120,7 +120,7 @@ CalcExpectedUtilityFunction = function(profit, R){
   UF1 = utilityFunctionExp(profit$profitBranch1, R)
   UF1_A = UF1[1]*0.5 + UF1[2]*0.5
 
-  #-----Branch 2----------#
+  #------Branch 2----------#
   UF2 = utilityFunctionExp(profit$profitBranch2, R)
   UF2_A = UF2[1]*0.5 + UF2[2]*0.5
   
@@ -168,5 +168,9 @@ plot(result_RnD, final = TRUE)
 ## Value of Information
 
 Using expected profit as the decision criteria, determine the value of learning for certain whether the research and development will be successful before a decision has to be made about whether to initially manufacture 100,000 or 200,000 PC boards.
+
+```{r Value of Information}
+
+```
 
 
