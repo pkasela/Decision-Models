@@ -1,0 +1,359 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Assignment 1: Printed circuits},
+            pdfauthor={Pranav Kasela},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Assignment 1: Printed circuits}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Pranav Kasela}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{18-03-2019}
+
+
+\begin{document}
+\maketitle
+
+\subsection{Introduction}\label{introduction}
+
+\emph{MC Manufacturing} has contracted to provide \emph{DISCO
+Electronics} with printed circuit (``PC'') boards under the following
+terms: (1) 100,000 PC boards will be delivered to DISCO in one month,
+and (2) DISCO has an option to take delivery of an additional 100,000
+boards in three months by giving Aba 30 days notice. DISCO will pay
+\$5.00 for each board that it purchases. MC manufactures the PC boards
+using a batch process, and manufacturing costs are as follows: (1) there
+is a fixed setup cost of \$250,000 for any manufacturing batch run,
+regardless of the size of the run, and (2) there is a marginal
+manufacturing cost of \$2.00 per board regardless of the size of the
+batch run. MC must decide whether to manufacture all 200,000 PC boards
+now or whether to only manufacture 100,000 now and manufacture the other
+100,000 boards only if DISCO exercises its option to buy those boards.
+If MC manufactures 200,000 now and DISCO does not exercise its option,
+then the manufacturing cost of the extra 100,000 boards will be totally
+lost. MC believes there is a 50\% chance DISCO will exercise its option
+to buy the additional 100,000 PC boards.
+
+\subsection{The decision tree}\label{the-decision-tree}
+
+\begin{itemize}
+\tightlist
+\item
+  Draw a decision tree for the decision that MC faces.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(yaml)}
+\KeywordTok{library}\NormalTok{(radiant)}
+\KeywordTok{library}\NormalTok{(radiant.model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{setwd}\NormalTok{(}\StringTok{"/home/pranav/Desktop/Decision Models Assignments/Assignment 1/"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Error in setwd("/home/pranav/Desktop/Decision Models Assignments/Assignment 1/"): cannot change working directory
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tree =}\StringTok{ }\KeywordTok{yaml.load_file}\NormalTok{(}\DataTypeTok{input =} \StringTok{"./Board_Production.yaml"}\NormalTok{)}
+
+\NormalTok{result =}\KeywordTok{dtree}\NormalTok{(}\DataTypeTok{yl =}\NormalTok{ tree)}
+
+\KeywordTok{plot}\NormalTok{(result, }\DataTypeTok{final =} \OtherTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-202b6d9078879e5c77ad}{}
+
+In the Decision Tree initially \emph{MC Manufacturing} need to choose
+either to produce the whole batch of \(200,000\) pieces toghether or to
+do it in two different moments, each time \emph{MC Manufacturing} starts
+the batch production procedure as mentioned in the introduction \emph{MC
+Manufacturing} pays \(\$250,000\), \emph{MC Manufacturing} does not know
+if \emph{DISCO Electronics} will buy the second batch, but \emph{MC
+Manufacturing} knows its the probability.
+
+\subsection{Expected value}\label{expected-value}
+
+\begin{itemize}
+\tightlist
+\item
+  Determine the preferred course of action for MC assuming it uses
+  expected profit as its decision criterion.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(result, }\DataTypeTok{final =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-231d0239b9eca5a0eae4}{}
+
+The preferred course of action is to produce the two batches toghether
+since it has an expected value of \(\$100,000\) against \(\$75,000\) of
+the other branch in which \emph{MC Manufacturing} produces the two batch
+separately.
+
+\subsection{Utility Function and Certainty
+Equivalent}\label{utility-function-and-certainty-equivalent}
+
+Assume that all the information still holds, except assume now that MC
+has an exponential utility function with a risk tolerance of
+\(\$100,000\).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{utilityFunctionExp <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(X, R) \{}
+\NormalTok{res <-}\StringTok{ }\DecValTok{1}\OperatorTok{-}\StringTok{ }\KeywordTok{exp}\NormalTok{(}\OperatorTok{-}\NormalTok{X}\OperatorTok{/}\NormalTok{R)}
+\KeywordTok{return}\NormalTok{(res)}
+\NormalTok{\}}
+
+\NormalTok{CertEquivalent =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(EU, R)\{}
+\NormalTok{CE =}\StringTok{ }\OperatorTok{-}\NormalTok{R}\OperatorTok{*}\KeywordTok{ln}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{EU)}
+\KeywordTok{return}\NormalTok{(CE)}
+\NormalTok{\}}
+
+\NormalTok{CalcExpectedUtilityFunction =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(profit, R)\{}
+  \CommentTok{#------Branch 1----------#}
+\NormalTok{  UF1 =}\StringTok{ }\KeywordTok{utilityFunctionExp}\NormalTok{(profit}\OperatorTok{$}\NormalTok{profitBranch1, R)}
+\NormalTok{  EU1 =}\StringTok{ }\NormalTok{UF1[}\DecValTok{1}\NormalTok{]}\OperatorTok{*}\FloatTok{0.5} \OperatorTok{+}\StringTok{ }\NormalTok{UF1[}\DecValTok{2}\NormalTok{]}\OperatorTok{*}\FloatTok{0.5}
+
+  \CommentTok{#------Branch 2----------#}
+\NormalTok{  UF2 =}\StringTok{ }\KeywordTok{utilityFunctionExp}\NormalTok{(profit}\OperatorTok{$}\NormalTok{profitBranch2, R)}
+\NormalTok{  EU2 =}\StringTok{ }\NormalTok{UF2[}\DecValTok{1}\NormalTok{]}\OperatorTok{*}\FloatTok{0.5} \OperatorTok{+}\StringTok{ }\NormalTok{UF2[}\DecValTok{2}\NormalTok{]}\OperatorTok{*}\FloatTok{0.5}
+  
+  \CommentTok{#----Return Final Result----#}
+  \KeywordTok{return}\NormalTok{(}\KeywordTok{c}\NormalTok{(EU1, EU2))}
+\NormalTok{\}}
+
+\NormalTok{CalcBranchCE =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(profit, R)\{}
+\NormalTok{CE_vett =}\StringTok{ }\KeywordTok{CertEquivalent}\NormalTok{(}\KeywordTok{CalcExpectedUtilityFunction}\NormalTok{(profit, R), R)}
+\KeywordTok{return}\NormalTok{(CE_vett)}
+\NormalTok{\}}
+
+\CommentTok{#Create a DataFrame with Profits per Branch}
+
+\NormalTok{index <-}\StringTok{ }\DecValTok{1}\OperatorTok{:}\DecValTok{2}
+\NormalTok{profitBranch1 <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{35}\NormalTok{,}\OperatorTok{-}\DecValTok{15}\NormalTok{)}
+\NormalTok{profitBranch2 <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{10}\NormalTok{,}\DecValTok{5}\NormalTok{)}
+\NormalTok{profit <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\StringTok{"X"}\NormalTok{=index,}\StringTok{"profitBranch1"}\NormalTok{=profitBranch1,}\StringTok{"profitBranch2"}\NormalTok{=profitBranch2)}
+\NormalTok{R=}\DecValTok{10}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  Determine MC's preferred course of action.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{CE <-}\StringTok{ }\KeywordTok{CalcBranchCE}\NormalTok{(profit,R)}
+
+\NormalTok{CE_Branch1 <-}\StringTok{ }\NormalTok{CE[}\DecValTok{1}\NormalTok{]}
+\NormalTok{CE_Branch2 <-}\StringTok{ }\NormalTok{CE[}\DecValTok{2}\NormalTok{]}
+\KeywordTok{cat}\NormalTok{(}\KeywordTok{paste0}\NormalTok{(}\StringTok{'Certainty Equivalent of Branch 1:'}\NormalTok{,CE_Branch1),}\KeywordTok{paste0}\NormalTok{(}\StringTok{'Certainty Equivalent of Branch 2:'}\NormalTok{,CE_Branch2),}\DataTypeTok{sep=}\StringTok{'}\CharTok{\textbackslash{}n}\StringTok{'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Certainty Equivalent of Branch 1:-8.13568167929173
+Certainty Equivalent of Branch 2:7.19070196379839
+\end{verbatim}
+
+We can see that the preferred course is the Branch 2, in which we wait
+before producing the other batch, which could have been expected since
+the R is positive thus the \emph{MC Manufacturing} is risk averse, and
+the Branch 2 have 0 probabilty of loss, while in the Branch 1 \emph{MC
+Manufacturing} has \(50\%\) chance of failing.
+
+\subsection{Modification of the
+process}\label{modification-of-the-process}
+
+For the decision in the preceding point, MC Manufacturing has created a
+new option: it can conduct some research and development in an attempt
+to lower the fixed setup cost associated with manufacturing a batch of
+the PC boards. This research and development would not be completed in
+time to influence the setup cost for the initial batch that DISCO has
+ordered, but would be completed before the second batch would have to be
+manufactured. The research and development will cost \(\$25,000\), and
+there is a 0.4 probability that it will be successful. If it is
+successful, then the fixed setup cost per batch will be reduced by
+\(\$200,000\) to \(\$50,000\). If the research and development is not
+successful, then there will be no reduction in the setup cost. There
+will be no other benefits from the research and development besides the
+potential reduction in setup cost for the DISCO reorder.
+
+\begin{itemize}
+\tightlist
+\item
+  Using expected profit as the decision criterion, determine whether MC
+  should undertake the research and development.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tree_RnD =}\StringTok{ }\KeywordTok{yaml.load_file}\NormalTok{(}\DataTypeTok{input =} \StringTok{"./Board_Production_RnD.yaml"}\NormalTok{)}
+\NormalTok{result_RnD =}\StringTok{ }\KeywordTok{dtree}\NormalTok{(}\DataTypeTok{yl =}\NormalTok{ tree_RnD)}
+
+\KeywordTok{plot}\NormalTok{(result_RnD, }\DataTypeTok{final =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-f3042a54266a04061cd0}{}
+
+The R\&D(Research and Developement) branch has an Expected Value of
+\(\$90,000\) which is still lower than the Branch 1 of producing
+everything toghether, so using the expected profit the preferred course
+is still Branch 1, thus \emph{MC Manufacturing} should not undertake the
+R\&D.
+
+\subsection{Value of Information}\label{value-of-information}
+
+Using expected profit as the decision criteria, determine the value of
+learning for certain whether the research and development will be
+successful before a decision has to be made about whether to initially
+manufacture \(100,000\) or \(200,000\) PC boards.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tree_PI =}\StringTok{ }\KeywordTok{yaml.load_file}\NormalTok{(}\DataTypeTok{input =} \StringTok{"./Board_Production_PI.yaml"}\NormalTok{)}
+\NormalTok{result_PI =}\StringTok{ }\KeywordTok{dtree}\NormalTok{(}\DataTypeTok{yl =}\NormalTok{ tree_PI)}
+
+
+\KeywordTok{plot}\NormalTok{(result_PI, }\DataTypeTok{final =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{htmlwidget-a47e42890b0384f79af3}{}
+
+The Expected Value using this information is \(\$120,000\) while the
+expected value without the information on the success of R\&D was
+\(\$100,000\) so the value of information using the expected profit is
+\(\$120,000 - \$100,000 = \$20,000\).
+
+
+\end{document}

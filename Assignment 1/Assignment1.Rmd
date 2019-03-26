@@ -3,11 +3,8 @@ title: 'Assignment 1: Printed circuits'
 author: "Pranav Kasela"
 date: "18-03-2019"
 output: 
-  #pdf_document: 
-  #  df_print: paged
-  #  highlight: tango 
-  #  toc: yes
-  #  toc_depth: 5
+  #pdf_document:
+  #  latex_engine: pdflatex
   html_document:
     code_download: yes
     df_print: paged
@@ -21,6 +18,7 @@ output:
   #  theme: spacelab
   #  toc: yes
   #  toc_depth: 5
+always_allow_html: yes
 ---
 
 ```{r r_setup, include = FALSE}
@@ -76,33 +74,36 @@ will exercise its option to buy the additional 100,000 PC boards.
 
 -  Draw a decision tree for the decision that MC faces.
 
-```{r loading, message=FALSE}
+```{r loading library, message=FALSE}
 library(yaml)
 library(radiant)
 library(radiant.model)
 ```
 
-```{r Solution Tree}
+```{r First Solution Tree}
 setwd("/home/pranav/Desktop/Decision Models Assignments/Assignment 1/")
 tree = yaml.load_file(input = "./Board_Production.yaml")
 
 result =dtree(yl = tree)
+
 plot(result, final = FALSE)
 ```
+In the Decision Tree initially *MC Manufacturing* need to choose either to produce the whole batch of $200,000$ pieces toghether or to do it in two different moments, each time *MC Manufacturing* starts the batch production procedure as mentioned in the introduction *MC Manufacturing* pays $\$250,000$, *MC Manufacturing* does not know if *DISCO Electronics* will buy the second batch, but *MC Manufacturing* knows its the probability. 
 
 
 ## Expected value
 -  Determine the preferred course of action for MC assuming it uses expected profit as its decision criterion.
 
-```{r Expected Value}
-summary(result, input = FALSE, output = TRUE)
 
+```{r Expected Value}
 plot(result, final = TRUE)
 ```
 
+The preferred course of action is to produce the two batches toghether since it has an expected value of $\$100,000$ against $\$75,000$ of the other branch in which *MC Manufacturing* produces the two batch separately.
+
 ## Utility Function and Certainty Equivalent
 
-Assume that all the information still holds, except assume now that MC has an exponential utility function with a risk tolerance of $100,000.
+Assume that all the information still holds, except assume now that MC has an exponential utility function with a risk tolerance of $\$100,000$.
 
 ```{r Define Utility Functions}
 utilityFunctionExp <- function(X, R) {
@@ -118,14 +119,14 @@ return(CE)
 CalcExpectedUtilityFunction = function(profit, R){
   #------Branch 1----------#
   UF1 = utilityFunctionExp(profit$profitBranch1, R)
-  UF1_A = UF1[1]*0.5 + UF1[2]*0.5
+  EU1 = UF1[1]*0.5 + UF1[2]*0.5
 
   #------Branch 2----------#
   UF2 = utilityFunctionExp(profit$profitBranch2, R)
-  UF2_A = UF2[1]*0.5 + UF2[2]*0.5
+  EU2 = UF2[1]*0.5 + UF2[2]*0.5
   
   #----Return Final Result----#
-  return(c(UF1_A, UF2_A))
+  return(c(EU1, EU2))
 }
 
 CalcBranchCE = function(profit, R){
@@ -141,16 +142,22 @@ profitBranch2 <- c(10,5)
 profit <- data.frame("X"=index,"profitBranch1"=profitBranch1,"profitBranch2"=profitBranch2)
 R=10
 
+```
+- Determine MC's preferred course of action.
+
+```{r CE preffered course}
 CE <- CalcBranchCE(profit,R)
 
 CE_Branch1 <- CE[1]
 CE_Branch2 <- CE[2]
+cat(paste0('Certainty Equivalent of Branch 1:',CE_Branch1),paste0('Certainty Equivalent of Branch 2:',CE_Branch2),sep='\n')
 ```
-- Determine MC's preferred course of action.
+
+We can see that the preferred course is the Branch 2, in which we wait before producing the other batch, which could have been expected since the R is positive thus the *MC Manufacturing* is risk averse, and the Branch 2 have 0 probabilty of loss, while in the Branch 1 *MC Manufacturing* has $50\%$ chance of failing.
 
 ## Modification of the process
 
-For the decision in the preceding point, MC Manufacturing has created a new option: it can conduct some research and development in an attempt to lower the fixed setup cost associated with manufacturing a batch of the PC boards. This research and development would not be completed in time to influence the setup cost for the initial batch that DISCO has ordered, but would be completed before the second batch would have to be manufactured. The research and development will cost $25,000, and there is a 0.4 probability that it will be successful. If it is successful, then the fixed setup cost per batch will be reduced by $200,000 to $50,000. If the research and development is not successful, then there will be no reduction in the setup cost. There will be no other benefits from the research and development besides the potential reduction in setup cost for the DISCO reorder.
+For the decision in the preceding point, MC Manufacturing has created a new option: it can conduct some research and development in an attempt to lower the fixed setup cost associated with manufacturing a batch of the PC boards. This research and development would not be completed in time to influence the setup cost for the initial batch that DISCO has ordered, but would be completed before the second batch would have to be manufactured. The research and development will cost $\$25,000$, and there is a 0.4 probability that it will be successful. If it is successful, then the fixed setup cost per batch will be reduced by $\$200,000$ to $\$50,000$. If the research and development is not successful, then there will be no reduction in the setup cost. There will be no other benefits from the research and development besides the potential reduction in setup cost for the DISCO reorder.
 
 - Using expected profit as the decision criterion, determine whether MC should undertake the research and development.
 
@@ -158,26 +165,22 @@ For the decision in the preceding point, MC Manufacturing has created a new opti
 tree_RnD = yaml.load_file(input = "./Board_Production_RnD.yaml")
 result_RnD = dtree(yl = tree_RnD)
 
-plot(result_RnD, final=FALSE)
-
-summary(result_RnD, input = FALSE, output = TRUE)
-
 plot(result_RnD, final = TRUE)
 ```
 
+The R&D(Research and Developement) branch has an Expected Value of $\$90,000$ which is still lower than the Branch 1 of producing everything toghether, so using the expected profit the preferred course is still Branch 1, thus *MC Manufacturing* should not undertake the R&D.
+
 ## Value of Information
 
-Using expected profit as the decision criteria, determine the value of learning for certain whether the research and development will be successful before a decision has to be made about whether to initially manufacture 100,000 or 200,000 PC boards.
+Using expected profit as the decision criteria, determine the value of learning for certain whether the research and development will be successful before a decision has to be made about whether to initially manufacture $100,000$ or $200,000$ PC boards.
 
 ```{r Value of Information}
 tree_PI = yaml.load_file(input = "./Board_Production_PI.yaml")
 result_PI = dtree(yl = tree_PI)
 
-plot(result_PI, final=FALSE)
-
-summary(result_PI, input = FALSE, output = TRUE)
 
 plot(result_PI, final = TRUE)
 ```
 
+The Expected Value using this information is $\$120,000$ while the expected value without the information on the success of R&D was $\$100,000$ so the value of information using the expected profit is $\$120,000 - \$100,000 = \$20,000$. 
 

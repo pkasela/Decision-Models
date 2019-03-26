@@ -1,10 +1,10 @@
 name: Board Production Decision RnD
 variables:
-    setup_cost: 25
-    manufacture_cost: 20
-    research_cost: 2.5
-    setup_RnD_cost: 5
-    unit_revenue: 50
+    setup_cost: 250
+    manufacture_cost: 200
+    research_cost: 25
+    setup_RnD_cost: 50
+    unit_revenue: 500
 
     prob_extra: 0.5
     prob_not_extra: 1-prob_extra
