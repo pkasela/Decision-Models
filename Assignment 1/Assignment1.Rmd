@@ -81,7 +81,6 @@ library(radiant.model)
 ```
 
 ```{r First Solution Tree}
-setwd("/home/pranav/Desktop/Decision Models Assignments/Assignment 1/")
 tree = yaml.load_file(input = "./Board_Production.yaml")
 
 result =dtree(yl = tree)
