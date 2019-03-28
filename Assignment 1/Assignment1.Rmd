@@ -1,10 +1,8 @@
 ---
 title: 'Assignment 1: Printed circuits'
-author: "Pranav Kasela"
-date: "18-03-2019"
+author: "Pranav Kasela - 846965"
+date: ""
 output: 
-  #pdf_document:
-  #  latex_engine: pdflatex
   html_document:
     code_download: yes
     df_print: paged
@@ -12,12 +10,17 @@ output:
     theme: spacelab
     toc: yes
     toc_depth: 5
-  #html_notebook:
-  #  df_print: paged
-  #  highlight: textmate
-  #  theme: spacelab
-  #  toc: yes
-  #  toc_depth: 5
+  pdf_document: 
+    df_print: paged
+    highlight: tango 
+    toc: yes
+    toc_depth: 5
+  html_notebook:
+    df_print: paged
+    highlight: textmate
+    theme: spacelab
+    toc: yes
+    toc_depth: 5
 always_allow_html: yes
 ---
 
@@ -30,7 +33,8 @@ knitr::opts_chunk$set(
   cache = FALSE,
   message = FALSE,
   dpi = 200,
-  warning = FALSE
+  warning = FALSE,
+  dev = 'pdf'
 )
 
 ## width to use when printing tables etc.
@@ -79,6 +83,7 @@ library(yaml)
 library(radiant)
 library(radiant.model)
 ```
+### Solution
 
 ```{r First Solution Tree}
 tree = yaml.load_file(input = "./Board_Production.yaml")
@@ -87,20 +92,24 @@ result =dtree(yl = tree)
 
 plot(result, final = FALSE)
 ```
-In the Decision Tree initially *MC Manufacturing* need to choose either to produce the whole batch of $200,000$ pieces toghether or to do it in two different moments, each time *MC Manufacturing* starts the batch production procedure as mentioned in the introduction *MC Manufacturing* pays $\$250,000$, *MC Manufacturing* does not know if *DISCO Electronics* will buy the second batch, but *MC Manufacturing* knows its the probability. 
+
+In the Decision Tree initially *MC Manufacturing* need to choose either to produce the whole batch of $200,000$ pieces toghether or to do it in two different moments, each time *MC Manufacturing* starts the batch production procedure, as mentioned in the introduction, *MC Manufacturing* pays $\$250,000$, *MC Manufacturing* does not know if *DISCO Electronics* will buy the second batch, but *MC Manufacturing* knows its the probability. Also we assume that *MC Manufacturing* does not have an option not to produce anything since in introduction we have that the contract is already signed. 
+In the decision tree above we can see the initial choice to produce everything or not to produce everything and wait for the decision of *DISCO Electronics*, in both branches we have a chance node to indicate possibity that *DISCO Electronics* will ask for another $100,000$ PC boards or not. We choose also to scale the values by $1,000$ to have smaller number during the calculations, so a profit of $\$350$ indicates a profit of $\$350,000$. 
+One thing we note immediately is that the alternative to produce everything toghether avoid the setup cost of $\$250,000$ twice but at the same moment it is the most risky one, since we have $50\%$ probability to have a loss of $\$150,000$.
 
 
 ## Expected value
 -  Determine the preferred course of action for MC assuming it uses expected profit as its decision criterion.
 
-
+### Solution
 ```{r Expected Value}
 plot(result, final = TRUE)
 ```
 
-The preferred course of action is to produce the two batches toghether since it has an expected value of $\$100,000$ against $\$75,000$ of the other branch in which *MC Manufacturing* produces the two batch separately.
+From the decision tree we can see that the preferred course of action is to produce the two batches toghether since it has an expected value of $\$100,000$ against $\$75,000$ of the other branch in which *MC Manufacturing* produces the two batch separately.
 
 ## Utility Function and Certainty Equivalent
+
 
 Assume that all the information still holds, except assume now that MC has an exponential utility function with a risk tolerance of $\$100,000$.
 
@@ -136,23 +145,25 @@ return(CE_vett)
 #Create a DataFrame with Profits per Branch
 
 index <- 1:2
-profitBranch1 <- c(35,-15)
-profitBranch2 <- c(10,5)
+profitBranch1 <- c(350,-150)
+profitBranch2 <- c(100,50)
 profit <- data.frame("X"=index,"profitBranch1"=profitBranch1,"profitBranch2"=profitBranch2)
-R=10
+R=100 #Remeber we scaled everything by 1000, so the R goes from 100,000 to 100
 
 ```
 - Determine MC's preferred course of action.
+
+### Solution
 
 ```{r CE preffered course}
 CE <- CalcBranchCE(profit,R)
 
 CE_Branch1 <- CE[1]
 CE_Branch2 <- CE[2]
-cat(paste0('Certainty Equivalent of Branch 1:',CE_Branch1),paste0('Certainty Equivalent of Branch 2:',CE_Branch2),sep='\n')
+cat(paste0('Certainty Equivalent of Branch of producing eveything together:',CE_Branch1),paste0('Certainty Equivalent of Branch of producing separately:',CE_Branch2),sep='\n')
 ```
 
-We can see that the preferred course is the Branch 2, in which we wait before producing the other batch, which could have been expected since the R is positive thus the *MC Manufacturing* is risk averse, and the Branch 2 have 0 probabilty of loss, while in the Branch 1 *MC Manufacturing* has $50\%$ chance of failing.
+We can see that the preferred course is now the Branch in which we wait before producing the other batch, which could have been expected since the R is positive thus the *MC Manufacturing* is risk averse, and the Branch 2 have 0 probabilty of loss, while in the Branch 1 *MC Manufacturing* has $50\%$ chance of failing with a loss of $\$150,000$.
 
 ## Modification of the process
 
@@ -160,18 +171,23 @@ For the decision in the preceding point, MC Manufacturing has created a new opti
 
 - Using expected profit as the decision criterion, determine whether MC should undertake the research and development.
 
+### Solution
+
+
 ```{r Modification}
 tree_RnD = yaml.load_file(input = "./Board_Production_RnD.yaml")
 result_RnD = dtree(yl = tree_RnD)
 
 plot(result_RnD, final = TRUE)
 ```
-
-The R&D(Research and Developement) branch has an Expected Value of $\$90,000$ which is still lower than the Branch 1 of producing everything toghether, so using the expected profit the preferred course is still Branch 1, thus *MC Manufacturing* should not undertake the R&D.
+Since it will not be completed before the first batch, it would not make any sense to research in case we choose to produce everything toghether, since it would only extra cost without any benefit for the company. So in case we undergo the R&D(Research and Developement) proccess we will consider only the case we were to produce the two batch separately.
+The R&D branch has an Expected Value of $\$90,000$ which is still lower than the Branch in which we have a production of everything toghether, so using the expected profit the preferred course is still Branch of producing everything together, thus *MC Manufacturing* should not undertake the R&D.
 
 ## Value of Information
 
 Using expected profit as the decision criteria, determine the value of learning for certain whether the research and development will be successful before a decision has to be made about whether to initially manufacture $100,000$ or $200,000$ PC boards.
+
+### Solution
 
 ```{r Value of Information}
 tree_PI = yaml.load_file(input = "./Board_Production_PI.yaml")
@@ -181,5 +197,6 @@ result_PI = dtree(yl = tree_PI)
 plot(result_PI, final = TRUE)
 ```
 
-The Expected Value using this information is $\$120,000$ while the expected value without the information on the success of R&D was $\$100,000$ so the value of information using the expected profit is $\$120,000 - \$100,000 = \$20,000$. 
+Since we are asked to determine the value of learning for certain the information, we assume the information to be perfect, the Expected Value using this perfetct information is $\$120,000$ while the best expected value without the information on the success of R&D was $\$100,000$ so the value of information using the expected profit is $\$120,000 - \$100,000 = \$20,000$. 
 
+We also have that in case of the failure of R&D, *MC Manufacturing* should decide to produce everything toghether, while in the case of a successful R&D *MC Manufacturing* should produce the two batches separately using as the measure expected value. In case of the success of R&D and after chosing to produce the two batch separately we have that with a probability of $50\%$ that the second batch will not be needed, so the the research is useful only in one case among a total of 8 possible cases, which is an information that *MC Manufacturing* take in consideration.
