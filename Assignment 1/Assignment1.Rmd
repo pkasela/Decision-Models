@@ -15,6 +15,7 @@ output:
     highlight: tango 
     toc: yes
     toc_depth: 5
+    keep_tex: true
   html_notebook:
     df_print: paged
     highlight: textmate
@@ -22,6 +23,7 @@ output:
     toc: yes
     toc_depth: 5
 always_allow_html: yes
+graphics: yes
 ---
 
 ```{r r_setup, include = FALSE}
@@ -61,6 +63,8 @@ pre, code, pre code {
 }
 </style>
 
+#Assignment
+
 ## Introduction
 *MC Manufacturing* has contracted to provide *DISCO Electronics* with printed circuit ("PC") boards under
 the following terms: (1) 100,000 PC boards will be delivered to DISCO in one month, and (2) DISCO has an
@@ -88,14 +92,15 @@ library(radiant.model)
 ```{r First Solution Tree}
 tree = yaml.load_file(input = "./Board_Production.yaml")
 
-result =dtree(yl = tree)
+result = dtree(yl = tree)
 
 plot(result, final = FALSE)
 ```
+\includegraphics{Assignment1_files/figure-latex/EX1.png}
 
-In the Decision Tree initially *MC Manufacturing* need to choose either to produce the whole batch of $200,000$ pieces toghether or to do it in two different moments, each time *MC Manufacturing* starts the batch production procedure, as mentioned in the introduction, *MC Manufacturing* pays $\$250,000$, *MC Manufacturing* does not know if *DISCO Electronics* will buy the second batch, but *MC Manufacturing* knows its the probability. Also we assume that *MC Manufacturing* does not have an option not to produce anything since in introduction we have that the contract is already signed. 
-In the decision tree above we can see the initial choice to produce everything or not to produce everything and wait for the decision of *DISCO Electronics*, in both branches we have a chance node to indicate possibity that *DISCO Electronics* will ask for another $100,000$ PC boards or not. We choose also to scale the values by $1,000$ to have smaller number during the calculations, so a profit of $\$350$ indicates a profit of $\$350,000$. 
-One thing we note immediately is that the alternative to produce everything toghether avoid the setup cost of $\$250,000$ twice but at the same moment it is the most risky one, since we have $50\%$ probability to have a loss of $\$150,000$.
+In the Decision Tree initially *MC Manufacturing* need to choose either to produce the whole batch of $200,000$ pieces toghether or to do it in two different moments, each time *MC Manufacturing* starts the batch production procedure, as mentioned in the introduction, *MC Manufacturing* pays $\$250,000$, *MC Manufacturing* does not know if *DISCO Electronics* will buy the second batch, but *MC Manufacturing* knows its the probability. Also we assume that *MC Manufacturing* does not have an option to produce $0$ quantity since in introduction we have that the contract has already been made. 
+In the decision tree above we can see the initial choice to produce everything or not to produce everything and wait for the decision of *DISCO Electronics*, in both branches we have a chance node to indicate possibity that *DISCO Electronics* will ask for another $100,000$ PC boards or not. We choose to scale the values by $1,000$ to have smaller number during the calculations, so a profit of $\$350$ indicates a profit of $\$350,000$. 
+One thing we note immediately is that the alternative to produce everything toghether avoids the setup cost of $\$250,000$ twice but at the same moment it is the most risky one, since we have $50\%$ probability to have a loss of $\$150,000$.
 
 
 ## Expected value
@@ -105,6 +110,8 @@ One thing we note immediately is that the alternative to produce everything togh
 ```{r Expected Value}
 plot(result, final = TRUE)
 ```
+\includegraphics{Assignment1_files/figure-latex/EX2.png}
+
 
 From the decision tree we can see that the preferred course of action is to produce the two batches toghether since it has an expected value of $\$100,000$ against $\$75,000$ of the other branch in which *MC Manufacturing* produces the two batch separately.
 
@@ -113,32 +120,31 @@ From the decision tree we can see that the preferred course of action is to prod
 
 Assume that all the information still holds, except assume now that MC has an exponential utility function with a risk tolerance of $\$100,000$.
 
+We start by defining the functions that will be needed for the solution. 
 ```{r Define Utility Functions}
 utilityFunctionExp <- function(X, R) {
-res <- 1- exp(-X/R)
-return(res)
+  return(1- exp(-X/R))
 }
 
-CertEquivalent = function(EU, R){
-CE = -R*ln(1-EU)
-return(CE)
+CertEquivalent <- function(EU, R){
+  return(-R*ln(1-EU))
 }
 
-CalcExpectedUtilityFunction = function(profit, R){
+CalcExpectedUtilityFunction <- function(profit, R){
   #------Branch 1----------#
-  UF1 = utilityFunctionExp(profit$profitBranch1, R)
-  EU1 = UF1[1]*0.5 + UF1[2]*0.5
+  UF1 <- utilityFunctionExp(profit$profitBranch1, R)
+  EU1 <- UF1[1]*0.5 + UF1[2]*0.5 #Expected Utility Branch 1
 
   #------Branch 2----------#
-  UF2 = utilityFunctionExp(profit$profitBranch2, R)
-  EU2 = UF2[1]*0.5 + UF2[2]*0.5
+  UF2 <- utilityFunctionExp(profit$profitBranch2, R)
+  EU2 <- UF2[1]*0.5 + UF2[2]*0.5 #Expected Utility Branch 2
   
   #----Return Final Result----#
   return(c(EU1, EU2))
 }
 
-CalcBranchCE = function(profit, R){
-CE_vett = CertEquivalent(CalcExpectedUtilityFunction(profit, R), R)
+CalcBranchCE <- function(profit, R){
+CE_vett <- CertEquivalent(CalcExpectedUtilityFunction(profit, R), R)
 return(CE_vett)
 }
 
@@ -158,12 +164,32 @@ R=100 #Remeber we scaled everything by 1000, so the R goes from 100,000 to 100
 ```{r CE preffered course}
 CE <- CalcBranchCE(profit,R)
 
-CE_Branch1 <- CE[1]
-CE_Branch2 <- CE[2]
-cat(paste0('Certainty Equivalent of Branch of producing eveything together:',CE_Branch1),paste0('Certainty Equivalent of Branch of producing separately:',CE_Branch2),sep='\n')
+CE_Branch1 <- CE[1]*1000
+CE_Branch2 <- CE[2]*1000
+cat(paste0('Certainty Equivalent of Branch of producing eveything together: ',CE_Branch1),
+    paste0('Certainty Equivalent of Branch of producing separately: ',CE_Branch2),
+    'NOTE: The values are re-scaled to the right scale.',
+    '********************************************************',sep='\n')
 ```
 
-We can see that the preferred course is now the Branch in which we wait before producing the other batch, which could have been expected since the R is positive thus the *MC Manufacturing* is risk averse, and the Branch 2 have 0 probabilty of loss, while in the Branch 1 *MC Manufacturing* has $50\%$ chance of failing with a loss of $\$150,000$.
+We can see that the preferred course is now the Branch in which we wait before producing the other batch. We have that the Certainty Equivalent in this case is $\$71907$, which is smaller than the expected value thus in this case *MC Manufacturing* is risk averse.
+
+Since the difference between the Certainty Equivalent of the two branches is so high, we can say that for a large neighborhood (interval of a value) of $R = 100,000$ we will have that the preferred branch will be the one in which we wait to produce the other batch. Actually from the plot below we have that the preferred choice is to wait before producing everything until a very big value of R (between $1,100,000$ and $1,300,000$). This change of preference is there since for large R we become more risk seeking. 
+
+```{r interval of R}
+R = seq(2, 1300, 1)
+res1 = c()
+res2 = c()
+for (i in 1:length(R)) {
+vRes = CalcBranchCE(profit, R[i])
+res1[i] = vRes[1]
+res2[i] = vRes[2]
+}
+plot(R, res1, type="l", col="blue", ylab="CE(scaled by 1000)", xlab = "R(scaled by 1000)",
+     xlim=c(-1, max(R)+1), ylim=c(min(res1), max(res2)))
+points (R, res2, type="l", col="red")
+legend(500,-50,legend=c('Produce Separately','Produce Together'),col=c("red", "blue"), lty=1)
+```
 
 ## Modification of the process
 
@@ -180,8 +206,13 @@ result_RnD = dtree(yl = tree_RnD)
 
 plot(result_RnD, final = TRUE)
 ```
-Since it will not be completed before the first batch, it would not make any sense to research in case we choose to produce everything toghether, since it would only extra cost without any benefit for the company. So in case we undergo the R&D(Research and Developement) proccess we will consider only the case we were to produce the two batch separately.
+\includegraphics{Assignment1_files/figure-latex/EX4.png}
+
+Since the R&D will not be completed before the first batch, it would not make any sense to research in case we choose to produce everything toghether, since it would only extra cost without any benefit for the company. So in case we undergo the R&D(Research and Developement) proccess we will consider only the case we were to produce the two batch separately.
+
 The R&D branch has an Expected Value of $\$90,000$ which is still lower than the Branch in which we have a production of everything toghether, so using the expected profit the preferred course is still Branch of producing everything together, thus *MC Manufacturing* should not undertake the R&D.
+
+We decided to keep the two choices of Producing Separeptly ("Don't Produce Everything") and R&D separated, one could have equivalently created another decision node in the "Don't Produce Everything" branch of either doing or not the R&D. 
 
 ## Value of Information
 
@@ -196,7 +227,34 @@ result_PI = dtree(yl = tree_PI)
 
 plot(result_PI, final = TRUE)
 ```
+\includegraphics{Assignment1_files/figure-latex/EX5.png}
 
-Since we are asked to determine the value of learning for certain the information, we assume the information to be perfect, the Expected Value using this perfetct information is $\$120,000$ while the best expected value without the information on the success of R&D was $\$100,000$ so the value of information using the expected profit is $\$120,000 - \$100,000 = \$20,000$. 
+Since we are asked to determine the value of learning for certain the information, we assume the information to be perfect, the Expected Value using this perfetct information is $\$120,000$ while the best expected value without the information on the success of R&D was $\$100,000$, since the value of information using the expected profit is the difference between the two values, thus $\$120,000 - \$100,000 = \$20,000$ is the value of such information. 
 
-We also have that in case of the failure of R&D, *MC Manufacturing* should decide to produce everything toghether, while in the case of a successful R&D *MC Manufacturing* should produce the two batches separately using as the measure expected value. In case of the success of R&D and after chosing to produce the two batch separately we have that with a probability of $50\%$ that the second batch will not be needed, so the the research is useful only in one case among a total of 8 possible cases, which is an information that *MC Manufacturing* take in consideration.
+We also have that in case of the failure of R&D, *MC Manufacturing* should decide to produce everything toghether, while in the case of a successful R&D *MC Manufacturing* should produce the two batches separately using as the measure expected value. In case of the success of R&D and after chosing to produce the two batch separately we have that with a probability of $50\%$ that the second batch will not be needed, so the the research is useful only in one case among a total of 8 possible cases, which is an information that *MC Manufacturing* should take in consideration.
+
+In the model here we decided to show all the possible alternative, for example in the case of failure of R&D it would not make any sense to Produce the boards separately since we already know from point 2 that the other branch is more convenient in this case using as measure the expected value. The choice was made so that, in case the company were to decide to bargain/change any of the provided cost or revenue, we could see it's repercussion on every branch. Another reason was the completeness of the structure.
+
+\pagebreak
+
+# Appendix
+
+Here we print the structure of the yaml file.
+
+## Exercise 1
+
+```{r yaml 1}
+summary(result, input = FALSE, output = TRUE)
+```
+
+## Exercise 2
+
+```{r yaml 2}
+summary(result_RnD, input = FALSE, output = TRUE)
+```
+
+## Exercise 3
+
+```{r yaml 3}
+summary(result_PI, input = FALSE, output = TRUE)
+```
