@@ -3,6 +3,12 @@ title: 'Assignment 1: Printed circuits'
 author: "Pranav Kasela - 846965"
 date: ""
 output: 
+  pdf_document: 
+    df_print: paged
+    highlight: tango 
+    toc: yes
+    toc_depth: 5
+    keep_tex: true
   html_document:
     code_download: yes
     df_print: paged
@@ -10,12 +16,6 @@ output:
     theme: spacelab
     toc: yes
     toc_depth: 5
-  pdf_document: 
-    df_print: paged
-    highlight: tango 
-    toc: yes
-    toc_depth: 5
-    keep_tex: true
   html_notebook:
     df_print: paged
     highlight: textmate
