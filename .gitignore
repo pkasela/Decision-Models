@@ -1,2 +1,7 @@
 .Rhistory
 .RData
+
+*.aux
+*.nb.html
+*.out
+*.toc
