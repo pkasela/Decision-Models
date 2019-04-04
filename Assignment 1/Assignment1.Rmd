@@ -241,19 +241,19 @@ In the model here we decided to show all the possible alternative, for example i
 
 Here we print the structure of the yaml file.
 
-## Exercise 1
+## Exercise 1 & 2
 
 ```{r yaml 1}
 summary(result, input = FALSE, output = TRUE)
 ```
 
-## Exercise 2
+## Exercise 4
 
 ```{r yaml 2}
 summary(result_RnD, input = FALSE, output = TRUE)
 ```
 
-## Exercise 3
+## Exercise 5
 
 ```{r yaml 3}
 summary(result_PI, input = FALSE, output = TRUE)
