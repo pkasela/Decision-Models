@@ -3,11 +3,6 @@ title: 'Assignment 1: Printed circuits'
 author: "Pranav Kasela - 846965"
 date: ""
 output: 
-  pdf_document: 
-    df_print: paged
-    highlight: tango 
-    toc: yes
-    toc_depth: 5
   html_document:
     code_download: yes
     df_print: paged
@@ -21,7 +16,11 @@ output:
     theme: spacelab
     toc: yes
     toc_depth: 5
-#plot problem solved by installing webshot and phantomjs
+  pdf_document: 
+    df_print: paged
+    highlight: tango 
+    toc: yes
+    toc_depth: 5
 ---
 
 ```{r r_setup, include = FALSE}

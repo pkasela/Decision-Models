@@ -52,11 +52,26 @@ R=10
 
 CE <- CalcBranchCE(profit,R)
 
-CE_Branch1 <- CE[1]
-CE_Branch2 <- CE[2]
-cat(paste0('Certainty Equivalent of Branch 1:',CE_Branch1),
-    paste0('Certainty Equivalent of Branch 2:',CE_Branch2),
-    sep='\n')
+CE_Branch1 <- CE[1]*1000
+CE_Branch2 <- CE[2]*1000
+cat(paste0('Certainty Equivalent of Branch of producing eveything together: ',CE_Branch1),
+    paste0('Certainty Equivalent of Branch of producing separately: ',CE_Branch2),
+    'NOTE: The values are re-scaled to the right scale.',
+    '********************************************************',sep='\n')
+
+#Exercise 3 Extra
+R = seq(2, 1300, 1)
+res1 = c()
+res2 = c()
+for (i in 1:length(R)) {
+  vRes = CalcBranchCE(profit, R[i])
+  res1[i] = vRes[1]
+  res2[i] = vRes[2]
+}
+plot(R, res1, type="l", col="blue", ylab="CE(scaled by 1000)", xlab = "R(scaled by 1000)",
+     xlim=c(-1, max(R)+1), ylim=c(min(res1), max(res2)))
+points (R, res2, type="l", col="red")
+legend(500,-50,legend=c('Produce Separately','Produce Together'),col=c("red", "blue"), lty=1)
 
 
 #Exercise 4
