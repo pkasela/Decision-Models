@@ -1,10 +1,10 @@
 ---
 title: "Assigment 2 - Alloy Corporation"
 output:
-  pdf_document:
-    fig_caption: yes
   html_document:
     df_print: paged
+  pdf_document:
+    fig_caption: yes
   prettydoc::html_pretty:
     df_print: paged
     highlight: vignette
@@ -41,13 +41,13 @@ The company has 1300 pounds of aluminum and 900 pounds of copper copper for use 
 
 The various products are made using four different machines: forger, reamer, shaper, and planer. The following table summarizes the time required by each product on each machine. Each machine has 60 hours of time available in the coming week.
 
-![Districts](minutes.png)
+![Districts](img/minutes.png)
 
 # Financial summary
 
 The controller recently presented management with the following financial summary of MNC's average weekly operations over the past quarter. From this report, the controller is arguing that the company should cease producing its B and C products.
 
-![Financial summary](costi.png)
+![Financial summary](img/costi.png)
 
 # Questions
 a. Do you agree with the controller's recommendation? Why or why not?
