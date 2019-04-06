@@ -3,7 +3,7 @@ library(radiant)
 library(radiant.model)
 
 #setwd("/home/pranav/Desktop/Decision Models Assignments/Assignment 1/")
-tree = yaml.load_file(input = "./Board_Production.yaml")
+tree = yaml.load_file(input = "./trees/Board_Production.yaml")
 
 result =dtree(yl = tree)
 
@@ -75,14 +75,14 @@ legend(500,-50,legend=c('Produce Separately','Produce Together'),col=c("red", "b
 
 
 #Exercise 4
-tree_RnD = yaml.load_file(input = "./Board_Production_RnD.yaml")
+tree_RnD = yaml.load_file(input = "./trees/Board_Production_RnD.yaml")
 result_RnD = dtree(yl = tree_RnD)
 
 plot(result_RnD, final = TRUE)
 
 
 #Exercise 5
-tree_PI = yaml.load_file(input = "./Board_Production_PI.yaml")
+tree_PI = yaml.load_file(input = "./trees/Board_Production_PI.yaml")
 result_PI = dtree(yl = tree_PI)
 
 
