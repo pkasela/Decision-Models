@@ -15,7 +15,7 @@ add.constraint(model,
                indices = c(1:4)) #Aluminium Constraint
 
 add.constraint(model,
-               xt = c(0.25,0.55,0.75,0),
+               xt = c(0.45,0.55,0.75,0),
                type = "<=",
                rhs = 900,
                indices = c(1:4)) #Copper Constraint

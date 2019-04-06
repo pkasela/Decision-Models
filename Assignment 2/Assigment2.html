@@ -334,7 +334,7 @@ add.constraint(model,
                indices = c(1:4)) #Aluminium Constraint
 
 add.constraint(model,
-               xt = c(0.25,0.55,0.75,0),
+               xt = c(0.45,0.55,0.75,0),
                type = &quot;&lt;=&quot;,
                rhs = 900,
                indices = c(1:4)) #Copper Constraint
@@ -376,7 +376,7 @@ dimnames(model)&lt;- list(c(&quot;Aluminium&quot;,&quot;Copper&quot;,&quot;Forge
 ##               A     B     C     D          
 ## Maximize   2.14  1.13     4  2.12          
 ## Aluminium  0.55  0.45  0.25     1  &lt;=  1300
-## Copper     0.25  0.55  0.75     0  &lt;=   900
+## Copper     0.45  0.55  0.75     0  &lt;=   900
 ## Forger      1.2     1     1   1.5  &lt;=  3600
 ## Reamer     1.75     1     1   1.5  &lt;=  3600
 ## Shaper      1.3   0.6   0.4     0  &lt;=  3600
