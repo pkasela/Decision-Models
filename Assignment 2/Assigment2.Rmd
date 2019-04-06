@@ -1,18 +1,21 @@
 ---
 title: "Assigment 2 - Alloy Corporation"
 output:
-  pdf_document: 
+  pdf_document:
     fig_caption: yes
-  prettydoc::html_pretty:
-    theme: architect
-    highlight: vignette
-    toc: yes
-    toc_depth: 5
-    df_print: paged
-    includes:
-      in_header: header.html
   html_document:
     df_print: paged
+  prettydoc::html_pretty:
+    df_print: paged
+    highlight: vignette
+    includes:
+      in_header: header.html
+    theme: architect
+    toc: yes
+    toc_depth: 5
+  word_document:
+    toc: yes
+    toc_depth: '5'
 ---
 
 # Introduction
@@ -59,3 +62,126 @@ i. If MNC wanted to increase the production of any product, which one would you 
 j. Which resources are preventing MNS from making more money? If they could acquire more of this resource how much should they acquire & how much should they be willing to pay to acquire it?
 k. How much should MNC be willing to pay to acquire more copper?
 l. If the marketing department wanted to decrease the price of the A product by $0.25, would the optimal solution change?
+
+# Solutions
+a. We have that using the current combination of Products, the Product B has negative net profit (-0.12 per Pound) while the Product C has positive net profit (1.5 per Pound), thus we **don't agree on controller's recommendation**. He is right on the cessation of the production of the product B but not of the product C.
+
+b. Our objective is to maximize the profit, for that we define the *Margin Profit* as the *Sales Revenue*-*Variable Costs* and the Margin Profit per Pound as *Margin Profit*/*Pounds Sold*, we ignore the fixed costs because if we included them, since they are constant, they will go on the right hand side of the objective function and will not change the problem itself.
+```{r table 1, echo=FALSE}
+library(knitr)
+
+Product <- c("Sales Revenue","Variable Costs","Margin","Pounds Sold","Margin per Pound")
+A <- c("5769","3200","2569","1200","2.14")
+B <- c("2000","1550","450","400","1.13")
+C <- c("700","300","400","100","4.00")
+D <- c("879","350","529","250","2.12")
+
+kable(data.frame(Product,A,B,C,D))
+```
+
+
+So, indicated with A the pound sold of Product A (same for B, C and D) , the objective function is:
+
+\[
+2.14 \cdot A + 1.13 \cdot B + 4 \cdot C + 2.12 \cdot D
+\]
+
+\pagebreak
+
+The domain of the variables are:
+\begin{align*}
+1200 &\leq A < +\infty \\
+450 &\leq B \leq 650\\
+0 &\leq C \leq 120\\
+0 &\leq D \leq 150\\ 
+\end{align*}
+
+Based on the composition of the material in each Product and the limited resources we also have that:
+
+\begin{align*}
+0.55 \cdot A + 0.45 \cdot B + 0.25 \cdot C + 1.00 \cdot D &\leq 1300 &\to &\text{Maximum Alminium}\\
+0.45 \cdot A + 0.55 \cdot B + 0.75 \cdot C + 0.00 \cdot D &\leq 900 &\to &\text{Maximum Copper}
+\end{align*}
+
+We also have a time limit on each Machine, so the following constraint is also valid:
+
+\begin{align*}
+1.20\cdot A + 1.00\cdot B + 1.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Forger}\\
+1.75\cdot A + 1.00\cdot B + 1.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Reamer}\\
+1.30\cdot A + 0.60\cdot B + 0.40 \cdot C + 0.00\cdot D &\leq 3600 &\to &\text{Shaper}\\
+2.50\cdot A + 1.20\cdot B + 2.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Planer}
+\end{align*}
+
+c. Here is the problem definition in R:
+
+```{r LP model, message=FALSE, results='hide'}
+if(require(lpSolveAPI)==FALSE) install.packages("lpSolveAPI")
+model = make.lp(0,4)                        # 4 Variables (A,B,C,D)
+lp.control(model, sense = "max")            #Maximazing Problem
+set.objfn(model,obj = c(2.14,1.13,4,2.12))  #Objective function coefficients
+
+row.add.mode(model,"on")
+
+add.constraint(model,
+               xt = c(0.55,0.45,0.25,1),
+               type = "<=",
+               rhs = 1300,
+               indices = c(1:4)) #Aluminium Constraint
+
+add.constraint(model,
+               xt = c(0.25,0.55,0.75,0),
+               type = "<=",
+               rhs = 900,
+               indices = c(1:4)) #Copper Constraint
+
+add.constraint(model,
+               xt = c(1.2,1,1,1.5),
+               type = "<=",
+               rhs = 3600,
+               indices = c(1:4)) #Forger Time Constraint
+
+add.constraint(model,
+               xt = c(1.75,1,1,1.5),
+               type = "<=",
+               rhs = 3600,
+               indices = c(1:4)) #Reamer Time Constraint
+
+add.constraint(model,
+               xt = c(1.3,0.6,0.4,0),
+               type = "<=",
+               rhs = 3600,
+               indices = c(1:4)) #Shaper Time Constraint
+
+add.constraint(model,
+               xt = c(2.5,1.2,2,1.5),
+               type = "<=",
+               rhs = 3600,
+               indices = c(1:4)) #Planer Time Constraint
+
+#lower and upper bounds
+set.bounds(model,lower = c(1200,450,0,0), upper = c(Inf,650,120,150)) 
+
+row.add.mode(model,"off")
+
+#Give names to contraints and variables
+dimnames(model)<- list(c("Aluminium","Copper","Forger","Reamer","Shaper","Planer"),
+                       c("A","B","C","D"))
+```
+
+```{r LP model print}
+print(model) #To see to model
+```
+
+
+d. We use the solve() function to solve the model:
+```{r LP model solution}
+solve(model) #result = 0 -> solved
+
+solution <- get.variables(model)
+cat("The optimal variables values are:","\n",
+    "A <-",solution[1],", B <-",solution[2],
+    ", C <-",solution[3],", D <-",solution[4])
+
+cat("The optimal objective function value is: ",get.objective(model))
+```
+
