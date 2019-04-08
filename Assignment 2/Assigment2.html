@@ -9,6 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
+<meta name="author" content="Pranav Kasela - 846965" />
 
 
 <title>Assigment 2 - Alloy Corporation</title>
@@ -186,6 +187,7 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">Assigment 2 - Alloy Corporation</h1>
+<h4 class="author"><em>Pranav Kasela - 846965</em></h4>
 
 </div>
 
@@ -241,10 +243,13 @@ $(document).ready(function () {
 </div>
 <div id="solutions" class="section level1">
 <h1>Solutions</h1>
-<ol style="list-style-type: lower-alpha">
-<li><p>We have that using the current combination of Products, the Product B has negative net profit (-0.12 per Pound) while the Product C has positive net profit (1.5 per Pound), thus we <strong>don’t agree on controller’s recommendation</strong>. He is right on the cessation of the production of the product B but not of the product C.</p></li>
-<li><p>Our objective is to maximize the profit, for that we define the <em>Margin Profit</em> as the <em>Sales Revenue</em>-<em>Variable Costs</em> and the Margin Profit per Pound as <em>Margin Profit</em>/<em>Pounds Sold</em>, we ignore the fixed costs because if we included them, since they are constant, they will go on the right hand side of the objective function and will not change the problem itself.</p></li>
-</ol>
+<div id="a." class="section level2">
+<h2>a.</h2>
+<p><strong>We don’t agree with the controller’s recommendation</strong>, we have that using the current combination of Products, the <em>Product B</em> has negative net profit (-0.12 per Pound) while the <em>Product C</em> has positive net profit (1.5 per Pound). If we used the net profit as a performance measure of the products,which implies that the demand of the products will not change in the future, the controller would right on the cessation of the production of the <em>Product B</em> but not of the <em>Product C</em>.  But as we can see that the demand of the <em>Product B</em> changed, using the current minimum amount for the product B we have that the net profit in this case would be <em>amount</em><span class="math inline">\(\cdot\)</span><em>Margin per Pound</em>(From the table below)<span class="math inline">\(-\)</span><em>Variable Costs</em> = <span class="math inline">\(1.125*450 - 500 = 6.25 &gt; 0\)</span> which is positive thus profitable. The interruption in the production of the <em>Product B</em> is arguable, but in the case of the <em>Product C</em> we see that the margin profit per Pound is <span class="math inline">\(4.00\)</span>, and it has a fixed cost of only <span class="math inline">\(250\)</span>, lowest one in all four products, thus we need to produce only <span class="math inline">\(63\)</span> pounds of Product C to have a profit, as long as this demand is satisfied there is no need to interrupt the production of the Product C.</p>
+</div>
+<div id="b." class="section level2">
+<h2>b.</h2>
+<p>Our objective is to maximize the profit, for that we define the <em>Margin Profit</em> as the <em>Sales Revenue</em>-<em>Variable Costs</em> and the Margin Profit per Pound as <em>Margin Profit</em>/<em>Pounds Sold</em>, we ignore the fixed costs because if we included them, since they are constant, they will go on the right hand side of the objective function and will not change the problem itself.</p>
 <table>
 <thead>
 <tr class="header">
@@ -293,11 +298,10 @@ $(document).ready(function () {
 </tr>
 </tbody>
 </table>
-<p>So, indicated with A the pound sold of Product A (same for B, C and D) , the objective function is:</p>
+<p>So, indicated with A the pound sold of Product A (same for B, C and D) , the <strong>objective function</strong> is:</p>
 <p><span class="math display">\[
 2.14 \cdot A + 1.13 \cdot B + 4 \cdot C + 2.12 \cdot D
 \]</span></p>
-
 The domain of the variables are:
 <span class="math display">\[\begin{align*}
 1200 &amp;\leq A &lt; +\infty \\
@@ -317,13 +321,14 @@ The domain of the variables are:
 1.30\cdot A + 0.60\cdot B + 0.40 \cdot C + 0.00\cdot D &amp;\leq 3600 &amp;\to &amp;\text{Shaper}\\
 2.50\cdot A + 1.20\cdot B + 2.00 \cdot C + 1.50\cdot D &amp;\leq 3600 &amp;\to &amp;\text{Planer}
 \end{align*}\]</span>
-<ol start="3" style="list-style-type: lower-alpha">
-<li>Here is the problem definition in R:</li>
-</ol>
+</div>
+<div id="c." class="section level2">
+<h2>c.</h2>
+<p>Here is the implementation of problem defined above in point <strong>b.</strong> in R:</p>
 <pre class="r"><code>if(require(lpSolveAPI)==FALSE) install.packages(&quot;lpSolveAPI&quot;)
-model = make.lp(0,4)                        # 4 Variables (A,B,C,D)
-lp.control(model, sense = &quot;max&quot;)            #Maximazing Problem
-set.objfn(model,obj = c(2.14,1.13,4,2.12))  #Objective function coefficients
+model = make.lp(0,4)                            # 4 Variables (A,B,C,D)
+lp.control(model, sense = &quot;max&quot;)                #Maximazing Problem
+set.objfn(model,obj = c(2.141,1.125,4,2.116))   #Objective function coefficients
 
 row.add.mode(model,&quot;on&quot;)
 
@@ -363,31 +368,32 @@ add.constraint(model,
                rhs = 3600,
                indices = c(1:4)) #Planer Time Constraint
 
-#lower and upper bounds
+#Setting lower and upper bounds
 set.bounds(model,lower = c(1200,450,0,0), upper = c(Inf,650,120,150)) 
 
 row.add.mode(model,&quot;off&quot;)
 
-#Give names to contraints and variables
+#Giving names to the contraints and variables
 dimnames(model)&lt;- list(c(&quot;Aluminium&quot;,&quot;Copper&quot;,&quot;Forger&quot;,&quot;Reamer&quot;,&quot;Shaper&quot;,&quot;Planer&quot;),
                        c(&quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;D&quot;))</code></pre>
 <pre class="r"><code>print(model) #To see to model</code></pre>
 <pre><code>## Model name: 
-##               A     B     C     D          
-## Maximize   2.14  1.13     4  2.12          
-## Aluminium  0.55  0.45  0.25     1  &lt;=  1300
-## Copper     0.45  0.55  0.75     0  &lt;=   900
-## Forger      1.2     1     1   1.5  &lt;=  3600
-## Reamer     1.75     1     1   1.5  &lt;=  3600
-## Shaper      1.3   0.6   0.4     0  &lt;=  3600
-## Planer      2.5   1.2     2   1.5  &lt;=  3600
-## Kind        Std   Std   Std   Std          
-## Type       Real  Real  Real  Real          
-## Upper       Inf   650   120   150          
-## Lower      1200   450     0     0</code></pre>
-<ol start="4" style="list-style-type: lower-alpha">
-<li>We use the solve() function to solve the model:</li>
-</ol>
+##                A      B      C      D          
+## Maximize   2.141  1.125      4  2.116          
+## Aluminium   0.55   0.45   0.25      1  &lt;=  1300
+## Copper      0.45   0.55   0.75      0  &lt;=   900
+## Forger       1.2      1      1    1.5  &lt;=  3600
+## Reamer      1.75      1      1    1.5  &lt;=  3600
+## Shaper       1.3    0.6    0.4      0  &lt;=  3600
+## Planer       2.5    1.2      2    1.5  &lt;=  3600
+## Kind         Std    Std    Std    Std          
+## Type        Real   Real   Real   Real          
+## Upper        Inf    650    120    150          
+## Lower       1200    450      0      0</code></pre>
+</div>
+<div id="d." class="section level2">
+<h2>d.</h2>
+<p>We use the solve() function to solve the model:</p>
 <pre class="r"><code>solve(model) #result = 0 -&gt; solved</code></pre>
 <pre><code>## [1] 0</code></pre>
 <pre class="r"><code>solution &lt;- get.variables(model)
@@ -397,7 +403,8 @@ cat(&quot;The optimal variables values are:&quot;,&quot;\n&quot;,
 <pre><code>## The optimal variables values are: 
 ##  A &lt;- 1200 , B &lt;- 450 , C &lt;- 30 , D &lt;- 0</code></pre>
 <pre class="r"><code>cat(&quot;The optimal objective function value is: &quot;,get.objective(model))</code></pre>
-<pre><code>## The optimal objective function value is:  3196.5</code></pre>
+<pre><code>## The optimal objective function value is:  3195.45</code></pre>
+</div>
 </div>
 
 

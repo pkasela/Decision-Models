@@ -1,21 +1,11 @@
 ---
 title: "Assigment 2 - Alloy Corporation"
+author: "Pranav Kasela - 846965"
 output:
   html_document:
     df_print: paged
   pdf_document:
     fig_caption: yes
-  prettydoc::html_pretty:
-    df_print: paged
-    highlight: vignette
-    includes:
-      in_header: header.html
-    theme: architect
-    toc: yes
-    toc_depth: 5
-  word_document:
-    toc: yes
-    toc_depth: '5'
 ---
 
 # Introduction
@@ -64,9 +54,15 @@ k. How much should MNC be willing to pay to acquire more copper?
 l. If the marketing department wanted to decrease the price of the A product by $0.25, would the optimal solution change?
 
 # Solutions
-a. We have that using the current combination of Products, the Product B has negative net profit (-0.12 per Pound) while the Product C has positive net profit (1.5 per Pound), thus we **don't agree on controller's recommendation**. He is right on the cessation of the production of the product B but not of the product C.
+## a.  
+**We don't agree with the controller's recommendation**, we have that using the current combination of Products, the *Product B* has negative net profit (-0.12 per Pound) while the *Product C* has positive net profit (1.5 per Pound).
+If we used the net profit as a performance measure of the products,which implies that the demand of the products will not change in the future, the controller would right on the cessation of the production of the *Product B* but not of the *Product C*. \newline 
+But as we can see that the demand of the *Product B* changed, using the current minimum amount for the product B we have that the net profit in this case would be *amount*$\cdot$*Margin per Pound*(From the table below)$-$*Variable Costs* = $1.125*450 - 500 = 6.25 > 0$ which is positive thus profitable. \newline
+The interruption in the production of the *Product B* is arguable, but in the case of the *Product C* we see that the margin profit per Pound is $4.00$, and it has a fixed cost of only $250$, lowest one in all four products, thus we need to produce only $63$ pounds of Product C to have a profit, as long as this demand is satisfied there is no need to interrupt the production of the Product C. 
 
-b. Our objective is to maximize the profit, for that we define the *Margin Profit* as the *Sales Revenue*-*Variable Costs* and the Margin Profit per Pound as *Margin Profit*/*Pounds Sold*, we ignore the fixed costs because if we included them, since they are constant, they will go on the right hand side of the objective function and will not change the problem itself.
+
+## b. 
+Our objective is to maximize the profit, for that we define the *Margin Profit* as the *Sales Revenue*-*Variable Costs* and the Margin Profit per Pound as *Margin Profit*/*Pounds Sold*, we ignore the fixed costs because if we included them, since they are constant, they will go on the right hand side of the objective function and will not change the problem itself.
 ```{r table 1, echo=FALSE}
 library(knitr)
 
@@ -79,14 +75,12 @@ D <- c("879","350","529","250","2.12")
 kable(data.frame(Product,A,B,C,D))
 ```
 
-
-So, indicated with A the pound sold of Product A (same for B, C and D) , the objective function is:
+So, indicated with A the pound sold of Product A (same for B, C and D) , the **objective function** is:
 
 \[
 2.14 \cdot A + 1.13 \cdot B + 4 \cdot C + 2.12 \cdot D
 \]
 
-\pagebreak
 
 The domain of the variables are:
 \begin{align*}
@@ -112,13 +106,14 @@ We also have a time limit on each Machine, so the following constraint is also v
 2.50\cdot A + 1.20\cdot B + 2.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Planer}
 \end{align*}
 
-c. Here is the problem definition in R:
+## c. 
+Here is the implementation of problem defined above in point **b.** in R:
 
 ```{r LP model, message=FALSE, results='hide'}
 if(require(lpSolveAPI)==FALSE) install.packages("lpSolveAPI")
-model = make.lp(0,4)                        # 4 Variables (A,B,C,D)
-lp.control(model, sense = "max")            #Maximazing Problem
-set.objfn(model,obj = c(2.14,1.13,4,2.12))  #Objective function coefficients
+model = make.lp(0,4)                            # 4 Variables (A,B,C,D)
+lp.control(model, sense = "max")                #Maximazing Problem
+set.objfn(model,obj = c(2.141,1.125,4,2.116))   #Objective function coefficients
 
 row.add.mode(model,"on")
 
@@ -158,12 +153,12 @@ add.constraint(model,
                rhs = 3600,
                indices = c(1:4)) #Planer Time Constraint
 
-#lower and upper bounds
+#Setting lower and upper bounds
 set.bounds(model,lower = c(1200,450,0,0), upper = c(Inf,650,120,150)) 
 
 row.add.mode(model,"off")
 
-#Give names to contraints and variables
+#Giving names to the contraints and variables
 dimnames(model)<- list(c("Aluminium","Copper","Forger","Reamer","Shaper","Planer"),
                        c("A","B","C","D"))
 ```
@@ -173,7 +168,8 @@ print(model) #To see to model
 ```
 
 
-d. We use the solve() function to solve the model:
+## d.
+We use the solve() function to solve the model:
 ```{r LP model solution}
 solve(model) #result = 0 -> solved
 
