@@ -2,10 +2,10 @@
 title: "Assigment 2 - Alloy Corporation"
 author: "Pranav Kasela - 846965"
 output:
-  html_document:
-    df_print: paged
   pdf_document:
     fig_caption: yes
+  html_document:
+    df_print: paged
 ---
 
 # Introduction
@@ -54,14 +54,16 @@ k. How much should MNC be willing to pay to acquire more copper?
 l. If the marketing department wanted to decrease the price of the A product by $0.25, would the optimal solution change?
 
 # Solutions
-## a.  
+## a. Do you agree with the controller’s recommendation? Why or why not?
+
 **We don't agree with the controller's recommendation**, we have that using the current combination of Products, the *Product B* has negative net profit (-0.12 per Pound) while the *Product C* has positive net profit (1.5 per Pound).
 If we used the net profit as a performance measure of the products,which implies that the demand of the products will not change in the future, the controller would right on the cessation of the production of the *Product B* but not of the *Product C*. \newline 
-But as we can see that the demand of the *Product B* changed, using the current minimum amount for the product B we have that the net profit in this case would be *amount*$\cdot$*Margin per Pound*(From the table below)$-$*Variable Costs* = $1.125*450 - 500 = 6.25 > 0$ which is positive thus profitable. \newline
-The interruption in the production of the *Product B* is arguable, but in the case of the *Product C* we see that the margin profit per Pound is $4.00$, and it has a fixed cost of only $250$, lowest one in all four products, thus we need to produce only $63$ pounds of Product C to have a profit, as long as this demand is satisfied there is no need to interrupt the production of the Product C. 
+But as we can see that the demand of the *Product B* changed, using the current minimum amount for the product B we have that the net profit in this case would be *amount*$\cdot$*Margin per Pound*(From the table below)$-$*Variable Costs* = $1.125*450 - 500 = 6.25 > 0$ which is positive thus profitable, but comparatively a small profit. If we could allocate the resources spent for the Product B in other Products we will have a better profit since the marginal profit for the Product B is the lowest one ($1.13$).\newline
+The interruption in the production of the *Product B* is still arguable and depends a lot also on the market request, but in the case of the *Product C* we see that the marginal profit per Pound is $4.00$, and it has a fixed cost of only $250$, lowest one in all four products, thus we need to produce only $63$ pounds of Product C to have a profit, as long as this demand is satisfied (in the last quarter it was satified) there is no need to interrupt the production of the Product C. 
 
 
-## b. 
+## b. Formulate an LP model for this problem.
+
 Our objective is to maximize the profit, for that we define the *Margin Profit* as the *Sales Revenue*-*Variable Costs* and the Margin Profit per Pound as *Margin Profit*/*Pounds Sold*, we ignore the fixed costs because if we included them, since they are constant, they will go on the right hand side of the objective function and will not change the problem itself.
 ```{r table 1, echo=FALSE}
 library(knitr)
@@ -106,7 +108,8 @@ We also have a time limit on each Machine, so the following constraint is also v
 2.50\cdot A + 1.20\cdot B + 2.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Planer}
 \end{align*}
 
-## c. 
+## c. Create a executable model in R for this problem and solve it.
+
 Here is the implementation of problem defined above in point **b.** in R:
 
 ```{r LP model, message=FALSE, results='hide'}
@@ -169,7 +172,8 @@ print(model) #To see to model
 ```
 
 
-## d.
+## d. What is the optimal solution?
+
 We use the solve() function to solve the model:
 ```{r LP model solution}
 solve(model) #result = 0 -> solved
@@ -184,7 +188,8 @@ cat("The optimal objective function value is: ",get.objective(model), "\n",
     "Thus the optimal net profit value is",get.objective(model) - fixed_cost)
 ```
 
-## e.
+## e. Perform the sensitivity analysis for this solution and answer the following questions.
+
 ```{r sensitivity function, include=FALSE}
 require(dplyr)
 require(tidyr)
@@ -268,19 +273,55 @@ So we have the the dual variables are $y_i = 0, \forall i=1,...,5$ and $y_6=2$ a
 3540 &\leq b_6 \leq 3780
 \end{align*}
 
-All the shadow price except for the last one are $0$ thus a small change in these contraints will not affect the solution.<br>\newline 
-The last contraint (Planer Time) has a shadow price of 2, which means that every minute we add/subtract to the planer time (staying in the given interval [3540,3780]), the solution increases/decreases by 2.
+All the shadow prices except for the last one are $0$ thus a small change in these contraints will not affect the solution.<br>\newline 
+The last contraint (Planer Time) has a shadow price of 2, which means that every minute we add/subtract to the planer time (staying in the given interval [3540,3780]), the value of the optimal solution increases/decreases by 2.
 
-## f.
-There are two was of checking if a solution is degenrate, the first one is using the theory we have that since no constraint has an allowable increase or decrease $= 0$, the solution is not degenerate.<br>\newline
+## f. Is the solution degenerate?
+
+There are two was of checking if a solution is degenrate, the first one is using the theory: we have that since no constraint has an allowable increase or decrease $= 0$, the solution is not degenerate.<br>\newline
 Another way is using the value of the following function:
 ```{r degenerate}
 solve.lpExtPtr(model)
 ```
-If the function has a value of 4 it means that the solution is degenerate, while 0 means that the optimal solution is found. Since in this case the value of the function confirms that the solution is not degenerate.
+If the function has a value of 4 it means that the solution is degenerate, while 0 means that the optimal solution is found. In this case the value of the function confirms that the solution is not degenerate.
 
-## g.
+## g. Is the solution unique?
 
 ```{r unique solution}
 get.solutioncount(model)
+```
+This function counts the number of solution for the model, in this case the result is 1, thus there is only one unique solution.<br>\newline
+We could also see that the first two quantities for Product A and B are the minimum market's requirement and the rest of the resources are allocated for the Product C which is the most profitable one. So it is reasonable to think that the obtained solution is the only best possibility. For example after satifying the market's minimun requirement for the Product A and B, if we were to allocate the resources for any product but C, the net profit will not go up as much as with the Product C, given that the production time of C is more or less the same as the other products.
+
+## h. If MNC wanted to decrease the production on any product, which one would you recommend and why?
+
+Given the marginal profit per Pound, we would recommend decreasing the Production of the Product B, in order to allocate the resources for a more profitable Product.
+
+## i. If MNC wanted to increase the production of any product, which one would you recommend and why?
+
+In this case we would recommend the increase in production of the Product C, which is the most profitable one.
+
+## j.Which resources are preventing MNS from making more money? If they could acquire more of this resource how much should they acquire & how much should they be willing to pay to acquire it?
+
+```{r constraint values}
+get.constraints(model)
+```
+The Planer time is the one which is preventing us to produce ant other product (because it's value is $=3600$ which is the limit), since it's shadow price is 2, if we buy 180 minutes more the value of the function will increase by $y_6 \times \Delta_2 = 2 \times 180 = 360$. So the company must pay at most 360 to increase the time by $180$ minutes in the Planer machine.
+
+## k. How much should MNC be willing to pay to acquire more copper?
+
+From the point j. we can see that the quantity of Copper used is 810, while the company has an available quantity of 900, thus MNC doesn't need extra copper, so the answer is 0. 
+
+## l. If the marketing department wanted to decrease the price of the A product by $0.25, would the optimal solution change?
+
+During the sensitivity analysis we saw that the the coefficient $C_1$ for the product A can decrease a lot without changing the optimal solution, so if we decrease it by $0.25$ the optimal solution will not change, only the value of the function will change.<br>\newline
+We can confirm it (even though it's unnecessary) creating a new model with the new coefficient for Product A.
+
+```{r Product A Price Decrease}
+model2 <- model #We just change the objective function
+set.objfn(model2,obj=c(2.141-0.25,1.125,4,2.116))
+solve(model2)
+cat(" New Model: ", get.variables(model2),"\n",
+    "Old Model: ", get.variables(model))
+cat("New value of the funtion: ", get.objective(model2))
 ```

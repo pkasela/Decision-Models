@@ -243,12 +243,12 @@ $(document).ready(function () {
 </div>
 <div id="solutions" class="section level1">
 <h1>Solutions</h1>
-<div id="a." class="section level2">
-<h2>a.</h2>
-<p><strong>We don’t agree with the controller’s recommendation</strong>, we have that using the current combination of Products, the <em>Product B</em> has negative net profit (-0.12 per Pound) while the <em>Product C</em> has positive net profit (1.5 per Pound). If we used the net profit as a performance measure of the products,which implies that the demand of the products will not change in the future, the controller would right on the cessation of the production of the <em>Product B</em> but not of the <em>Product C</em>.  But as we can see that the demand of the <em>Product B</em> changed, using the current minimum amount for the product B we have that the net profit in this case would be <em>amount</em><span class="math inline">\(\cdot\)</span><em>Margin per Pound</em>(From the table below)<span class="math inline">\(-\)</span><em>Variable Costs</em> = <span class="math inline">\(1.125*450 - 500 = 6.25 &gt; 0\)</span> which is positive thus profitable. The interruption in the production of the <em>Product B</em> is arguable, but in the case of the <em>Product C</em> we see that the margin profit per Pound is <span class="math inline">\(4.00\)</span>, and it has a fixed cost of only <span class="math inline">\(250\)</span>, lowest one in all four products, thus we need to produce only <span class="math inline">\(63\)</span> pounds of Product C to have a profit, as long as this demand is satisfied there is no need to interrupt the production of the Product C.</p>
+<div id="a.-do-you-agree-with-the-controllers-recommendation-why-or-why-not" class="section level2">
+<h2>a. Do you agree with the controller’s recommendation? Why or why not?</h2>
+<p><strong>We don’t agree with the controller’s recommendation</strong>, we have that using the current combination of Products, the <em>Product B</em> has negative net profit (-0.12 per Pound) while the <em>Product C</em> has positive net profit (1.5 per Pound). If we used the net profit as a performance measure of the products,which implies that the demand of the products will not change in the future, the controller would right on the cessation of the production of the <em>Product B</em> but not of the <em>Product C</em>.  But as we can see that the demand of the <em>Product B</em> changed, using the current minimum amount for the product B we have that the net profit in this case would be <em>amount</em><span class="math inline">\(\cdot\)</span><em>Margin per Pound</em>(From the table below)<span class="math inline">\(-\)</span><em>Variable Costs</em> = <span class="math inline">\(1.125*450 - 500 = 6.25 &gt; 0\)</span> which is positive thus profitable, but comparatively a small profit. If we could allocate the resources spent for the Product B in other Products we will have a better profit since the marginal profit for the Product B is the lowest one (<span class="math inline">\(1.13\)</span>).The interruption in the production of the <em>Product B</em> is still arguable and depends a lot also on the market request, but in the case of the <em>Product C</em> we see that the marginal profit per Pound is <span class="math inline">\(4.00\)</span>, and it has a fixed cost of only <span class="math inline">\(250\)</span>, lowest one in all four products, thus we need to produce only <span class="math inline">\(63\)</span> pounds of Product C to have a profit, as long as this demand is satisfied (in the last quarter it was satified) there is no need to interrupt the production of the Product C.</p>
 </div>
-<div id="b." class="section level2">
-<h2>b.</h2>
+<div id="b.-formulate-an-lp-model-for-this-problem." class="section level2">
+<h2>b. Formulate an LP model for this problem.</h2>
 <p>Our objective is to maximize the profit, for that we define the <em>Margin Profit</em> as the <em>Sales Revenue</em>-<em>Variable Costs</em> and the Margin Profit per Pound as <em>Margin Profit</em>/<em>Pounds Sold</em>, we ignore the fixed costs because if we included them, since they are constant, they will go on the right hand side of the objective function and will not change the problem itself.</p>
 <table>
 <thead>
@@ -322,8 +322,8 @@ The domain of the variables are:
 2.50\cdot A + 1.20\cdot B + 2.00 \cdot C + 1.50\cdot D &amp;\leq 3600 &amp;\to &amp;\text{Planer}
 \end{align*}\]</span>
 </div>
-<div id="c." class="section level2">
-<h2>c.</h2>
+<div id="c.-create-a-executable-model-in-r-for-this-problem-and-solve-it." class="section level2">
+<h2>c. Create a executable model in R for this problem and solve it.</h2>
 <p>Here is the implementation of problem defined above in point <strong>b.</strong> in R:</p>
 <pre class="r"><code>if(require(lpSolveAPI)==FALSE) install.packages(&quot;lpSolveAPI&quot;)
 model = make.lp(0,4)                            # 4 Variables (A,B,C,D)
@@ -392,8 +392,8 @@ name.lp(model, &quot;Alloy Corporation&quot;)</code></pre>
 ## Upper        Inf    650    120    150          
 ## Lower       1200    450      0      0</code></pre>
 </div>
-<div id="d." class="section level2">
-<h2>d.</h2>
+<div id="d.-what-is-the-optimal-solution" class="section level2">
+<h2>d. What is the optimal solution?</h2>
 <p>We use the solve() function to solve the model:</p>
 <pre class="r"><code>solve(model) #result = 0 -&gt; solved</code></pre>
 <pre><code>## [1] 0</code></pre>
@@ -409,8 +409,8 @@ cat(&quot;The optimal variables values are:&quot;,&quot;\n&quot;,
 <pre><code>## The optimal objective function value is:  3195.45 
 ##  Thus the optimal net profit value is 1545.45</code></pre>
 </div>
-<div id="e." class="section level2">
-<h2>e.</h2>
+<div id="e.-perform-the-sensitivity-analysis-for-this-solution-and-answer-the-following-questions." class="section level2">
+<h2>e. Perform the sensitivity analysis for this solution and answer the following questions.</h2>
 <pre class="r"><code>printSensitivityObj(model)</code></pre>
 <pre><code>##   Objs        Sensitivity
 ## 1   C1    -inf &lt;= C1 &lt;= 5
@@ -442,17 +442,52 @@ So we have the the dual variables are <span class="math inline">\(y_i = 0, \fora
 -\infty &amp;&lt; b_5 &lt; +\infty\\
 3540 &amp;\leq b_6 \leq 3780
 \end{align*}\]</span>
-<p>All the shadow price except for the last one are <span class="math inline">\(0\)</span> thus a small change in these contraints will not affect the solution.<br> The last contraint (Planer Time) has a shadow price of 2, which means that every minute we add/subtract to the planer time (staying in the given interval [3540,3780]), the solution increases/decreases by 2.</p>
+<p>All the shadow prices except for the last one are <span class="math inline">\(0\)</span> thus a small change in these contraints will not affect the solution.<br> The last contraint (Planer Time) has a shadow price of 2, which means that every minute we add/subtract to the planer time (staying in the given interval [3540,3780]), the value of the optimal solution increases/decreases by 2.</p>
 </div>
-<div id="f." class="section level2">
-<h2>f.</h2>
-<p>There are two was of checking if a solution is degenrate, the first one is using the theory we have that since no constraint has an allowable increase or decrease <span class="math inline">\(= 0\)</span>, the solution is not degenerate.<br>Another way is using the value of the following function:</p>
+<div id="f.-is-the-solution-degenerate" class="section level2">
+<h2>f. Is the solution degenerate?</h2>
+<p>There are two was of checking if a solution is degenrate, the first one is using the theory: we have that since no constraint has an allowable increase or decrease <span class="math inline">\(= 0\)</span>, the solution is not degenerate.<br>Another way is using the value of the following function:</p>
 <pre class="r"><code>solve.lpExtPtr(model)</code></pre>
 <pre><code>## [1] 0</code></pre>
-<p>If the function has a value of 4 it means that the solution is degenerate, while 0 means that the optimal solution is found. Since in this case the value of the function confirms that the solution is not degenerate.</p>
+<p>If the function has a value of 4 it means that the solution is degenerate, while 0 means that the optimal solution is found. In this case the value of the function confirms that the solution is not degenerate.</p>
 </div>
-<div id="g." class="section level2">
-<h2>g.</h2>
+<div id="g.-is-the-solution-unique" class="section level2">
+<h2>g. Is the solution unique?</h2>
+<pre class="r"><code>get.solutioncount(model)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<p>This function counts the number of solution for the model, in this case the result is 1, thus there is only one unique solution.<br>We could also see that the first two quantities for Product A and B are the minimum market’s requirement and the rest of the resources are allocated for the Product C which is the most profitable one. So it is reasonable to think that the obtained solution is the only best possibility. For example after satifying the market’s minimun requirement for the Product A and B, if we were to allocate the resources for any product but C, the net profit will not go up as much as with the Product C, given that the production time of C is more or less the same as the other products.</p>
+</div>
+<div id="h.-if-mnc-wanted-to-decrease-the-production-on-any-product-which-one-would-you-recommend-and-why" class="section level2">
+<h2>h. If MNC wanted to decrease the production on any product, which one would you recommend and why?</h2>
+<p>Given the marginal profit per Pound, we would recommend decreasing the Production of the Product B, in order to allocate the resources for a more profitable Product.</p>
+</div>
+<div id="i.-if-mnc-wanted-to-increase-the-production-of-any-product-which-one-would-you-recommend-and-why" class="section level2">
+<h2>i. If MNC wanted to increase the production of any product, which one would you recommend and why?</h2>
+<p>In this case we would recommend the increase in production of the Product C, which is the most profitable one.</p>
+</div>
+<div id="j.which-resources-are-preventing-mns-from-making-more-money-if-they-could-acquire-more-of-this-resource-how-much-should-they-acquire-how-much-should-they-be-willing-to-pay-to-acquire-it" class="section level2">
+<h2>j.Which resources are preventing MNS from making more money? If they could acquire more of this resource how much should they acquire &amp; how much should they be willing to pay to acquire it?</h2>
+<pre class="r"><code>get.constraints(model)</code></pre>
+<pre><code>## [1]  870  810 1920 2580 1842 3600</code></pre>
+<p>The Planer time is the one which is preventing us to produce ant other product (because it’s value is <span class="math inline">\(=3600\)</span> which is the limit), since it’s shadow price is 2, if we buy 180 minutes more the value of the function will increase by <span class="math inline">\(y_6 \times \Delta_2 = 2 \times 180 = 360\)</span>. So the company must pay at most 360 to increase the time by <span class="math inline">\(180\)</span> minutes in the Planer machine.</p>
+</div>
+<div id="k.-how-much-should-mnc-be-willing-to-pay-to-acquire-more-copper" class="section level2">
+<h2>k. How much should MNC be willing to pay to acquire more copper?</h2>
+<p>From the point j. we can see that the quantity of Copper used is 810, while the company has an available quantity of 900, thus MNC doesn’t need extra copper, so the answer is 0.</p>
+</div>
+<div id="l.-if-the-marketing-department-wanted-to-decrease-the-price-of-the-a-product-by-0.25-would-the-optimal-solution-change" class="section level2">
+<h2>l. If the marketing department wanted to decrease the price of the A product by $0.25, would the optimal solution change?</h2>
+<p>During the sensitivity analysis we saw that the the coefficient <span class="math inline">\(C_1\)</span> for the product A can decrease a lot without changing the optimal solution, so if we decrease it by <span class="math inline">\(0.25\)</span> the optimal solution will not change, only the value of the function will change.<br>We can confirm it (even though it’s unnecessary) creating a new model with the new coefficient for Product A.</p>
+<pre class="r"><code>model2 &lt;- model #We just change the objective function
+set.objfn(model2,obj=c(2.141-0.25,1.125,4,2.116))
+solve(model2)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>cat(&quot; New Model: &quot;, get.variables(model2),&quot;\n&quot;,
+    &quot;Old Model: &quot;, get.variables(model))</code></pre>
+<pre><code>##  New Model:  1200 450 30 0 
+##  Old Model:  1200 450 30 0</code></pre>
+<pre class="r"><code>cat(&quot;New value of the funtion: &quot;, get.objective(model2))</code></pre>
+<pre><code>## New value of the funtion:  2895.45</code></pre>
 </div>
 </div>
 

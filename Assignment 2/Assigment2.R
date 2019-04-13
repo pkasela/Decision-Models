@@ -142,4 +142,19 @@ solve.lpExtPtr(model)
 ################################################
 ################################################
 #Exercise g.
-get.solutioncount(lp.model)
+get.solutioncount(model)
+
+################################################
+################################################
+#Exercise j. + shadow price from Exercise e.
+get.constraints(model)
+
+################################################
+################################################
+#Exercise l.
+model2 <- model #We just change the objective function
+set.objfn(model2,obj=c(2.141-0.25,1.125,4,2.116))
+solve(model2)
+cat(" New Model: ", get.variables(model2),"\n",
+    "Old Model: ", get.variables(model))
+cat("New value of the funtion: ", get.objective(model2))
