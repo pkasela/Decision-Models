@@ -375,9 +375,10 @@ row.add.mode(model,&quot;off&quot;)
 
 #Giving names to the contraints and variables
 dimnames(model)&lt;- list(c(&quot;Aluminium&quot;,&quot;Copper&quot;,&quot;Forger&quot;,&quot;Reamer&quot;,&quot;Shaper&quot;,&quot;Planer&quot;),
-                       c(&quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;D&quot;))</code></pre>
+                       c(&quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;D&quot;))
+name.lp(model, &quot;Alloy Corporation&quot;)</code></pre>
 <pre class="r"><code>print(model) #To see to model</code></pre>
-<pre><code>## Model name: 
+<pre><code>## Model name: Alloy Corporation
 ##                A      B      C      D          
 ## Maximize   2.141  1.125      4  2.116          
 ## Aluminium   0.55   0.45   0.25      1  &lt;=  1300
@@ -397,13 +398,61 @@ dimnames(model)&lt;- list(c(&quot;Aluminium&quot;,&quot;Copper&quot;,&quot;Forge
 <pre class="r"><code>solve(model) #result = 0 -&gt; solved</code></pre>
 <pre><code>## [1] 0</code></pre>
 <pre class="r"><code>solution &lt;- get.variables(model)
+fixed_cost &lt;- 1650
 cat(&quot;The optimal variables values are:&quot;,&quot;\n&quot;,
     &quot;A &lt;-&quot;,solution[1],&quot;, B &lt;-&quot;,solution[2],
     &quot;, C &lt;-&quot;,solution[3],&quot;, D &lt;-&quot;,solution[4])</code></pre>
 <pre><code>## The optimal variables values are: 
 ##  A &lt;- 1200 , B &lt;- 450 , C &lt;- 30 , D &lt;- 0</code></pre>
-<pre class="r"><code>cat(&quot;The optimal objective function value is: &quot;,get.objective(model))</code></pre>
-<pre><code>## The optimal objective function value is:  3195.45</code></pre>
+<pre class="r"><code>cat(&quot;The optimal objective function value is: &quot;,get.objective(model), &quot;\n&quot;,
+    &quot;Thus the optimal net profit value is&quot;,get.objective(model) - fixed_cost)</code></pre>
+<pre><code>## The optimal objective function value is:  3195.45 
+##  Thus the optimal net profit value is 1545.45</code></pre>
+</div>
+<div id="e." class="section level2">
+<h2>e.</h2>
+<pre class="r"><code>printSensitivityObj(model)</code></pre>
+<pre><code>##   Objs        Sensitivity
+## 1   C1    -inf &lt;= C1 &lt;= 5
+## 2   C2  -inf &lt;= C2 &lt;= 2.4
+## 3   C3 2.821 &lt;= C3 &lt;= inf
+## 4   C4    -inf &lt;= C4 &lt;= 3</code></pre>
+<p>We have that the base remains if the coeffiecient are in the following range:</p>
+<span class="math display">\[\begin{align*}
+-\infty &amp;&lt; C_1 \leq 5\\
+-\infty &amp;&lt; C_2 \leq 2.4\\
+2.821  &amp;\leq C_3 &lt; +\infty\\
+-\infty &amp;&lt; C_4 &lt; 3\\
+\end{align*}\]</span>
+<p>The fact that <span class="math inline">\(C_1\)</span> and <span class="math inline">\(C_2\)</span> can decrease all they want is due to the fact that the optimal solution satisfies the minimum constraint given for Product A and B, thus if we were to decrease the marginal profit per pound from how it is now, we will have that it still needs to satify the minimum quantity for Product A and B, so the solution will not change.<br>A similar argument applies for the coefficient <span class="math inline">\(C_4\)</span> of Product D, if we decrease <span class="math inline">\(C_4\)</span> the solution will not change since we will continue to not produce the Product C with the given constraints.<br>While for the coefficient <span class="math inline">\(C_3\)</span> if we increase it, since we produce only the product C, because the most profitable while satifying the given contraints even if we increased the obtained profit we will have that the optimal solution will not change.</p>
+<pre class="r"><code>printSensitivityRHS(model)</code></pre>
+<pre><code>##   Rhs duals        Sensitivity
+## 1  B1     0  -inf &lt;= B1 &lt;= inf
+## 2  B2     0  -inf &lt;= B2 &lt;= inf
+## 3  B3     0  -inf &lt;= B3 &lt;= inf
+## 4  B4     0  -inf &lt;= B4 &lt;= inf
+## 5  B5     0  -inf &lt;= B5 &lt;= inf
+## 6  B6     2 3540 &lt;= B6 &lt;= 3780</code></pre>
+So we have the the dual variables are <span class="math inline">\(y_i = 0, \forall i=1,...,5\)</span> and <span class="math inline">\(y_6=2\)</span> and the interval for the resources are:
+<span class="math display">\[\begin{align*}
+-\infty &amp;&lt; b_1 &lt; +\infty\\
+-\infty &amp;&lt; b_2 &lt; +\infty\\
+-\infty &amp;&lt; b_3 &lt; +\infty\\
+-\infty &amp;&lt; b_4 &lt; +\infty\\
+-\infty &amp;&lt; b_5 &lt; +\infty\\
+3540 &amp;\leq b_6 \leq 3780
+\end{align*}\]</span>
+<p>All the shadow price except for the last one are <span class="math inline">\(0\)</span> thus a small change in these contraints will not affect the solution.<br> The last contraint (Planer Time) has a shadow price of 2, which means that every minute we add/subtract to the planer time (staying in the given interval [3540,3780]), the solution increases/decreases by 2.</p>
+</div>
+<div id="f." class="section level2">
+<h2>f.</h2>
+<p>There are two was of checking if a solution is degenrate, the first one is using the theory we have that since no constraint has an allowable increase or decrease <span class="math inline">\(= 0\)</span>, the solution is not degenerate.<br>Another way is using the value of the following function:</p>
+<pre class="r"><code>solve.lpExtPtr(model)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<p>If the function has a value of 4 it means that the solution is degenerate, while 0 means that the optimal solution is found. Since in this case the value of the function confirms that the solution is not degenerate.</p>
+</div>
+<div id="g." class="section level2">
+<h2>g.</h2>
 </div>
 </div>
 
