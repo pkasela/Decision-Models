@@ -67,4 +67,79 @@ cat("The optimal variables values are:","\n",
     "A <-",solution[1],", B <-",solution[2],
     ", C <-",solution[3],", D <-",solution[4])
 
-cat("The optimal objective function value is: ",get.objective(model))
+cat("The optimal objective function value is: ",get.objective(model), "\n",
+    "Thus the optimal net profit value is",get.objective(model) - fixed_cost)
+
+################################################
+################################################
+#Exercise e.
+if(require(dplyr)==FALSE) install.packages("dplyr")
+if(require(tidyr)==FALSE) install.packages("tidyr")
+#two funtions for printing the sensitivity stuff
+printSensitivityRHS <- function(model, numVars){
+  
+  arg.rhs <- get.sensitivity.rhs(model)
+  arg.rhs$dualsfrom <- round(arg.rhs$dualsfrom,3)
+  arg.rhs$dualstill <- round(arg.rhs$dualstill,3)
+  numVars <- length(get.variables(model))
+  numRows <- length(arg.rhs$duals)
+  
+  symb <- c() 
+  for (i in c(1:numRows)) { 
+    symb[i] <- paste("B", i, sep = "" ) 
+  }
+  
+  rhs <- data.frame(rhs = symb,duals=arg.rhs$duals,arg.rhs)
+  
+  rhs<-rhs %>%
+    mutate(dualsfrom=replace(dualsfrom, dualsfrom < -1e10, "-inf")) %>%
+    mutate(dualstill=replace(dualstill, dualstill > 1e10, "inf")) %>%
+    unite(col = "Sensitivity",  
+          dualsfrom, rhs, dualstill , 
+          sep = " <= ", remove = FALSE) %>%
+    select(c("rhs","duals","Sensitivity"))
+  
+  colnames(rhs)[1]<-c('Rhs')
+  print(rhs[1:(numRows-numVars),])
+  #print(rhs)
+}
+
+printSensitivityObj <- function(model){
+  arg.obj = get.sensitivity.obj(model)
+  
+  #rounding stuff
+  arg.obj$objfrom <- round(arg.obj$objfrom,3)
+  arg.obj$objtill <- round(arg.obj$objtill,3)
+  
+  numRows <- length(arg.obj$objfrom)
+  symb <- c() 
+  for (i in c(1:numRows)) { 
+    symb[i] <- paste("C", i, sep = "" ) 
+  }
+  
+  obj <- data.frame(Objs = symb, arg.obj)
+  obj<-
+    obj %>%
+    mutate(objfrom=replace(objfrom, objfrom < -1e10, "-inf")) %>%
+    mutate(objtill=replace(objtill, objtill > 1e10, "inf")) %>%
+    unite(col = "Sensitivity",  
+          objfrom, Objs, objtill , 
+          sep = " <= ", remove = FALSE) %>%
+    select(c("Objs","Sensitivity"))
+  print(obj)
+}
+#print the sensitivity on the coefficients of objective function
+printSensitivityObj(model)
+#print sensitivity on the rhs of constraints
+printSensitivityRHS(model)
+################################################
+################################################
+#Exercise f.
+
+#Check the value to see if the solution is degenerate
+solve.lpExtPtr(model)
+
+################################################
+################################################
+#Exercise g.
+get.solutioncount(lp.model)

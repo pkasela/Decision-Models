@@ -190,8 +190,6 @@ require(dplyr)
 require(tidyr)
 
 printSensitivityRHS <- function(model, numVars){
-
-  #options(scipen=999)
   arg.rhs <- get.sensitivity.rhs(model)
   arg.rhs$dualsfrom <- round(arg.rhs$dualsfrom,3)
   arg.rhs$dualstill <- round(arg.rhs$dualstill,3)
@@ -219,9 +217,7 @@ printSensitivityRHS <- function(model, numVars){
 }
 
 printSensitivityObj <- function(model){
-  #options(scipen=999)
   arg.obj = get.sensitivity.obj(model)
-  
   #rounding stuff
   arg.obj$objfrom <- round(arg.obj$objfrom,3)
   arg.obj$objtill <- round(arg.obj$objtill,3)
@@ -284,3 +280,7 @@ solve.lpExtPtr(model)
 If the function has a value of 4 it means that the solution is degenerate, while 0 means that the optimal solution is found. Since in this case the value of the function confirms that the solution is not degenerate.
 
 ## g.
+
+```{r unique solution}
+get.solutioncount(model)
+```
