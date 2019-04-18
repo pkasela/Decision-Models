@@ -2,10 +2,10 @@
 title: "Assigment 2 - Alloy Corporation"
 author: "Pranav Kasela - 846965"
 output:
-  pdf_document:
-    fig_caption: yes
   html_document:
     df_print: paged
+  pdf_document:
+    fig_caption: yes
 ---
 
 # Introduction
@@ -64,6 +64,8 @@ The interruption in the production of the *Product B* is still arguable and depe
 
 ## b. Formulate an LP model for this problem.
 
+**We create two different models one using the binary variable (called bin_model) and the other one without using the binary variables (called model)**
+
 Our objective is to maximize the profit, for that we define the *Margin Profit* as the *Sales Revenue*-*Variable Costs* and the Margin Profit per Pound as *Margin Profit*/*Pounds Sold*, we ignore the fixed costs because if we included them, since they are constant, they will go on the right hand side of the objective function and will not change the problem itself.
 ```{r table 1, echo=FALSE}
 library(knitr)
@@ -76,6 +78,8 @@ D <- c("879","350","529","250","2.12")
 
 kable(data.frame(Product,A,B,C,D))
 ```
+
+We start by the one **without** the binary variables:
 
 So, indicated with A the pound sold of Product A (same for B, C and D) , the **objective function** is:
 
@@ -108,9 +112,61 @@ We also have a time limit on each Machine, so the following constraint is also v
 2.50\cdot A + 1.20\cdot B + 2.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Planer}
 \end{align*}
 
+The model **with** the binary variables:
+
+The **objective function** in this case is:
+
+\[
+2.14\cdot A +1.13\cdot B +4\cdot C +2.12\cdot D- 600\cdot Y_A- 500\cdot Y_B -250\cdot Y_C - 300\cdot Y_D
+\]
+
+
+The domain of the variables are:
+\begin{align*}
+1200 &\leq A < +\infty \\
+450 &\leq B \leq 650\\
+0 &\leq C \leq 120\\
+0 &\leq D \leq 150\\ 
+Y_i \in \{0,1\} &\text{ with } i=A,B,C,D 
+\end{align*}
+
+Based on the composition of the material in each Product and the limited resources we also have that:
+
+\begin{align*}
+0.55 \cdot A + 0.45 \cdot B + 0.25 \cdot C + 1.00 \cdot D &\leq 1300 &\to &\text{Maximum Alminium}\\
+0.45 \cdot A + 0.55 \cdot B + 0.75 \cdot C + 0.00 \cdot D &\leq 900 &\to &\text{Maximum Copper}
+\end{align*}
+
+We also have a time limit on each Machine, so the following constraint is also valid:
+
+\begin{align*}
+1.20\cdot A + 1.00\cdot B + 1.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Forger}\\
+1.75\cdot A + 1.00\cdot B + 1.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Reamer}\\
+1.30\cdot A + 0.60\cdot B + 0.40 \cdot C + 0.00\cdot D &\leq 3600 &\to &\text{Shaper}\\
+2.50\cdot A + 1.20\cdot B + 2.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Planer}
+\end{align*}
+
+Lastly we have the binary constraints:
+
+\begin{align*}
+A \leq M_A Y_A \text{ with } &M_A = \min(1300/0.55,900/0.45,3600/1.2,3600/1.75,3600/1.3,3600/2.5)=1440\\
+B \leq M_B Y_B \text{ with } &M_B = \min(1300/0.45,900/0.55,3600/1,3600/1,3600/0.6,3600/1.2)=1636.36\\
+C \leq M_C Y_C \text{ with } &M_C = \min(1300/0.25,900/0.75,3600/1,3600/1,3600/0.4,3600/2)=1200\\
+D \leq M_D Y_D \text{ with } &M_D = \min(1300/1,3600/1.5,3600/1.5,3600/1.5)=1300
+\end{align*}
+
+Additionally we want to produce a certain Product only if it is profitable after deducting the fixed cost so we will have:
+
+\begin{align*}
+A &\geq 600/2.14\cdot Y_A = 280.24 Y_A\\
+B &\geq 500/1.13\cdot Y_B = 444.44 Y_B\\
+C &\geq 250/4\cdot Y_C = 62.5 Y_C\\
+D &\geq 300/2.12\cdot Y_D = 141.78 Y_D
+\end{align*}
+
 ## c. Create a executable model in R for this problem and solve it.
 
-Here is the implementation of problem defined above in point **b.** in R:
+Here is the implementation of problem defined above in point **b.** of model in R:
 
 ```{r LP model, message=FALSE, results='hide'}
 if(require(lpSolveAPI)==FALSE) install.packages("lpSolveAPI")
@@ -171,7 +227,116 @@ name.lp(model, "Alloy Corporation")
 print(model) #To see to model
 ```
 
+Here is the implementation of problem defined above in point **b.** of bin_model in R:
+```{r LP bin_model, results='hide', message=FALSE}
+bin_model = make.lp(0,8)                            # 8 Variables (A,B,C,D)
+set.type(bin_model, c(5:8), "binary")
+lp.control(bin_model, sense = "max")                #Maximazing Problem
+set.objfn(bin_model,obj = c(2.141,1.125,4,2.116,-600,-500,-250,-300))   #Objective function coefficients
 
+
+row.add.mode(bin_model,"on")
+
+add.constraint(bin_model,
+               xt = c(0.55,0.45,0.25,1),
+               type = "<=",
+               rhs = 1300,
+               indices = c(1:4)) #Aluminium Constraint
+
+add.constraint(bin_model,
+               xt = c(0.45,0.55,0.75,0),
+               type = "<=",
+               rhs = 900,
+               indices = c(1:4)) #Copper Constraint
+
+add.constraint(bin_model,
+               xt = c(1.2,1,1,1.5),
+               type = "<=",
+               rhs = 3600,
+               indices = c(1:4)) #Forger Time Constraint
+
+add.constraint(bin_model,
+               xt = c(1.75,1,1,1.5),
+               type = "<=",
+               rhs = 3600,
+               indices = c(1:4)) #Reamer Time Constraint
+
+add.constraint(bin_model,
+               xt = c(1.3,0.6,0.4,0),
+               type = "<=",
+               rhs = 3600,
+               indices = c(1:4)) #Shaper Time Constraint
+
+add.constraint(bin_model,
+               xt = c(2.5,1.2,2,1.5),
+               type = "<=",
+               rhs = 3600,
+               indices = c(1:4)) #Planer Time Constraint
+
+add.constraint(bin_model,
+               xt = c(1,-1440),
+               type = "<=",
+               rhs = 0,
+               indices = c(1,5)) #binary contraint for A
+
+add.constraint(bin_model,
+               xt = c(1,-1636.36),
+               type = "<=",
+               rhs = 0,
+               indices = c(2,6)) #binary contraint for B
+
+add.constraint(bin_model,
+               xt = c(1,-1200),
+               type = "<=",
+               rhs = 0,
+               indices = c(3,7)) #binary contraint for C
+
+add.constraint(bin_model,
+               xt = c(1,-1300),
+               type = "<=",
+               rhs = 0,
+               indices = c(4,8)) #binary contraint for D
+
+add.constraint(bin_model,
+               xt = c(-1,280.24),
+               type = "<=",
+               rhs = 0,
+               indices = c(1,5)) #min contraint for A
+
+add.constraint(bin_model,
+               xt = c(-1,444.44),
+               type = "<=",
+               rhs = 0,
+               indices = c(2,6)) #min contraint for B
+
+add.constraint(bin_model,
+               xt = c(-1,62.5),
+               type = "<=",
+               rhs = 0,
+               indices = c(3,7)) #min contraint for C
+
+add.constraint(bin_model,
+               xt = c(-1,141.78),
+               type = "<=",
+               rhs = 0,
+               indices = c(4,8)) #min contraint for D
+
+#Setting lower and upper bounds
+set.bounds(bin_model,lower = c(1200,450,0,0,0,0,0,0), upper = c(Inf,650,120,150,1,1,1,1)) 
+
+row.add.mode(bin_model,"off")
+
+#Giving names to the contraints and variables
+dimnames(bin_model)<- list(c("Aluminium","Copper","Forger","Reamer","Shaper","Planer",
+                             "Binary A","Binary B","Binary C","Binary D",
+                             "Min Bin A","Min Bin B","Min Bin C","Min Bin D"),
+                           c("A","B","C","D","YA","YB","YC","YD"))
+name.lp(bin_model, "Alloy Corporation Binary Problem")
+```
+
+```{r Print bin_model}
+print(bin_model)
+```
 ## d. What is the optimal solution?
 
 We use the solve() function to solve the model:
@@ -186,6 +351,20 @@ cat("The optimal variables values are:","\n",
 
 cat("The optimal objective function value is: ",get.objective(model), "\n",
     "Thus the optimal net profit value is",get.objective(model) - fixed_cost)
+```
+
+We use the solve() function to solve the bin_model:
+```{r LP bin_model solution}
+solve(bin_model) #result = 0 -> solved
+
+solution <- get.variables(bin_model)
+cat("The optimal variables values are:","\n",
+    "A <-",solution[1],", B <-",solution[2],
+    ", C <-",solution[3],", D <-",solution[4] , "\n",
+    "Y_A <-",solution[5],", Y_B <-",solution[6],
+    ", Y_C <-",solution[7],", Y_D <-",solution[8])
+
+cat("The optimal objective function value is: ",get.objective(bin_model))
 ```
 
 ## e. Perform the sensitivity analysis for this solution and answer the following questions.
@@ -217,8 +396,8 @@ printSensitivityRHS <- function(model, numVars){
     select(c("rhs","duals","Sensitivity"))
   
   colnames(rhs)[1]<-c('Rhs')
-  print(rhs[1:(numRows-numVars),])
-  #print(rhs)
+  kable(rhs[1:(numRows-numVars),])
+  #kable(rhs)
 }
 
 printSensitivityObj <- function(model){
@@ -242,13 +421,14 @@ printSensitivityObj <- function(model){
           objfrom, Objs, objtill , 
           sep = " <= ", remove = FALSE) %>%
     select(c("Objs","Sensitivity"))
-    print(obj)
+    kable(obj)
 }
 ```
 
 ```{r sensitivity analysis Obj}
 printSensitivityObj(model)
 ```
+
 We have that the base remains if the coeffiecient are in the following range:
 
 \begin{align*}
@@ -263,7 +443,8 @@ While for the coefficient $C_3$  if we increase it, since we produce only the pr
 ```{r sensitivity analysis RHS}
 printSensitivityRHS(model)
 ```
-So we have the the dual variables are $y_i = 0, \forall i=1,...,5$ and $y_6=2$ and the interval for the resources are:
+
+So we have the the dual variables are $$y_i = 0, \forall i=1,...,5$$ and $$y_6=2$$ and the interval for the resources are:
 \begin{align*}
 -\infty &< b_1 < +\infty\\
 -\infty &< b_2 < +\infty\\
@@ -273,7 +454,7 @@ So we have the the dual variables are $y_i = 0, \forall i=1,...,5$ and $y_6=2$ a
 3540 &\leq b_6 \leq 3780
 \end{align*}
 
-All the shadow prices except for the last one are $0$ thus a small change in these contraints will not affect the solution.<br>\newline 
+All the shadow prices except for the last one are $0$ thus a small change in these contraints with null shadow prices will not affect the solution.<br>\newline 
 The last contraint (Planer Time) has a shadow price of 2, which means that every minute we add/subtract to the planer time (staying in the given interval [3540,3780]), the value of the optimal solution increases/decreases by 2.
 
 ## f. Is the solution degenerate?
@@ -291,15 +472,23 @@ If the function has a value of 4 it means that the solution is degenerate, while
 get.solutioncount(model)
 ```
 This function counts the number of solution for the model, in this case the result is 1, thus there is only one unique solution.<br>\newline
-We could also see that the first two quantities for Product A and B are the minimum market's requirement and the rest of the resources are allocated for the Product C which is the most profitable one. So it is reasonable to think that the obtained solution is the only best possibility. For example after satifying the market's minimun requirement for the Product A and B, if we were to allocate the resources for any product but C, the net profit will not go up as much as with the Product C, given that the production time of C is more or less the same as the other products.
+We could also see that the first two quantities for Product A and B are the minimum market's requirement and the rest of the resources are allocated for the Product C which is the most profitable one. So it is reasonable to think (but not obvious) that the obtained solution is the only best possibility. For example after satifying the market's minimun requirement for the Product A and B, if we were to allocate the resources for any product but C, the net profit will not go up as much as with the Product C, given that the production time of C is more or less the same as the other products.
 
 ## h. If MNC wanted to decrease the production on any product, which one would you recommend and why?
 
-Given the marginal profit per Pound, we would recommend decreasing the Production of the Product B, in order to allocate the resources for a more profitable Product.
+```{r dual values for products}
+#Use only the last 4 elements of the array
+red_cost <- tail(get.sensitivity.rhs(model)$duals,4)
+kable(data.frame("Variables"=c("A","B","C","D"), 
+           "Final_Quantity"=get.variables(model),
+           "Reduced_Cost"=red_cost))
+```
+
+One would be tempted to use the marginal profit per Pound, in this case he/she would recommend decreasing the Production of the Product B, in order to allocate the resources for a more profitable Product, but using the Reduced Cost we can see that the Product which will gain us more value reducing its production is the Product A with a reduce cost of $2.859$.
 
 ## i. If MNC wanted to increase the production of any product, which one would you recommend and why?
 
-In this case we would recommend the increase in production of the Product C, which is the most profitable one.
+In this case we would recommend the increase in production of the Product C, which is the most profitable one. All the other Products have a negative Reduced Cost. 
 
 ## j.Which resources are preventing MNS from making more money? If they could acquire more of this resource how much should they acquire & how much should they be willing to pay to acquire it?
 

@@ -63,6 +63,9 @@ print(model) #To see to model
 solve(model) #result = 0 -> solved
 
 solution <- get.variables(model)
+
+fixed_cost <- 1650
+
 cat("The optimal variables values are:","\n",
     "A <-",solution[1],", B <-",solution[2],
     ", C <-",solution[3],", D <-",solution[4])
@@ -132,6 +135,7 @@ printSensitivityObj <- function(model){
 printSensitivityObj(model)
 #print sensitivity on the rhs of constraints
 printSensitivityRHS(model)
+
 ################################################
 ################################################
 #Exercise f.
@@ -143,6 +147,15 @@ solve.lpExtPtr(model)
 ################################################
 #Exercise g.
 get.solutioncount(model)
+
+################################################
+################################################
+#Exercise h. & i.
+#Use only the last 4 elements of the array
+red_cost <- tail(get.sensitivity.rhs(model)$duals,4)
+print(data.frame("Variables"=c("A","B","C","D"), 
+                 "Final_Quantity"=get.variables(model),
+                 "Reduced_Cost"=red_cost))
 
 ################################################
 ################################################
