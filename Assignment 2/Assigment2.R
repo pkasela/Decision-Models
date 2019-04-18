@@ -171,6 +171,7 @@ print(bin_model)
 ################################################
 #Exercise d.
 
+#Non Binary model
 solve(model) #result = 0 -> solved
 
 solution <- get.variables(model)
@@ -183,6 +184,18 @@ cat("The optimal variables values are:","\n",
 
 cat("The optimal objective function value is: ",get.objective(model), "\n",
     "Thus the optimal net profit value is",get.objective(model) - fixed_cost)
+
+# Binary model 
+solve(bin_model) #result = 0 -> solved
+
+solution <- get.variables(bin_model)
+cat("The optimal variables values are:","\n",
+    "A <-",solution[1],", B <-",solution[2],
+    ", C <-",solution[3],", D <-",solution[4] , "\n",
+    "Y_A <-",solution[5],", Y_B <-",solution[6],
+    ", Y_C <-",solution[7],", Y_D <-",solution[8])
+
+cat("The optimal objective function value is: ",get.objective(bin_model))
 
 ################################################
 ################################################
