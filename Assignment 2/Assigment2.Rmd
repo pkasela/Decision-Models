@@ -2,10 +2,10 @@
 title: "Assigment 2 - Alloy Corporation"
 author: "Pranav Kasela - 846965"
 output:
-  html_document:
-    df_print: paged
   pdf_document:
     fig_caption: yes
+  html_document:
+    df_print: paged
 ---
 
 # Introduction
@@ -56,17 +56,17 @@ l. If the marketing department wanted to decrease the price of the A product by 
 # Solutions
 ## a. Do you agree with the controller’s recommendation? Why or why not?
 
-**We don't agree with the controller's recommendation**, we have that using the current combination of Products, the *Product B* has negative net profit (-0.12 per Pound) while the *Product C* has positive net profit (1.5 per Pound).
-If we used the net profit as a performance measure of the products,which implies that the demand of the products will not change in the future, the controller would right on the cessation of the production of the *Product B* but not of the *Product C*. \newline 
-But as we can see that the demand of the *Product B* changed, using the current minimum amount for the product B we have that the net profit in this case would be *amount*$\cdot$*Margin per Pound*(From the table below)$-$*Variable Costs* = $1.125*450 - 500 = 6.25 > 0$ which is positive thus profitable, but comparatively a small profit. If we could allocate the resources spent for the Product B in other Products we will have a better profit since the marginal profit for the Product B is the lowest one ($1.13$).\newline
-The interruption in the production of the *Product B* is still arguable and depends a lot also on the market request, but in the case of the *Product C* we see that the marginal profit per Pound is $4.00$, and it has a fixed cost of only $250$, lowest one in all four products, thus we need to produce only $63$ pounds of Product C to have a profit, as long as this demand is satisfied (in the last quarter it was satified) there is no need to interrupt the production of the Product C. 
+**We don't agree with the controller's recommendation**, using the current financial summary of Products, the *Product B* has negative net profit (-0.12 per Pound) while the *Product C* has positive net profit (1.5 per Pound).
+If we used the net profit as a performance measure of the products, which implies that the demand of the products will not change in the future, the controller would right on the cessation of the production of the *Product B* but not of the *Product C*.<br> \newline 
+But as we can see that the demand of the *Product B* changed, using the current minimum amount for the product B we have that the net profit in this case would be *amount*$\cdot$*Margin profit per Pound*(From the table below)$-$*Fixed Costs* = $1.125*450 - 500 = 6.25 > 0$ which is positive thus profitable, but it is a small profit. If we could allocate the resources spent for the Product B in other Products, such as Product C, we will have a better profit since the marginal profit for the Product B is the lowest one ($1.13$).<br>\newline
+The interruption in the production of the *Product B* is still arguable and depends a lot also on the market request, but in the case of the *Product C* we see that the marginal profit per Pound is $4.00$, and it has a fixed cost of only $250$, lowest one in all four products, thus we need to produce only $62.5$ pounds of Product C to have a profit, as long as this demand is satisfied (in the last quarter it was satified) there is no need to interrupt the production of the Product C. 
 
 
 ## b. Formulate an LP model for this problem.
 
 **We create two different models one using the binary variable (called bin_model) and the other one without using the binary variables (called model)**
 
-Our objective is to maximize the profit, for that we define the *Margin Profit* as the *Sales Revenue*-*Variable Costs* and the Margin Profit per Pound as *Margin Profit*/*Pounds Sold*, we ignore the fixed costs because if we included them, since they are constant, they will go on the right hand side of the objective function and will not change the problem itself.
+Our objective is to maximize the profit, for that we define the *Margin Profit* as the *Sales Revenue*-*Variable Costs* and the Margin Profit per Pound as *Margin Profit*/*Pounds Sold*.
 ```{r table 1, echo=FALSE}
 library(knitr)
 
@@ -80,6 +80,8 @@ kable(data.frame(Product,A,B,C,D))
 ```
 
 We start by the one **without** the binary variables:
+
+In this case we ignore the fixed costs because if we included them, since they are constant, they will go on the right hand side of the objective function and will not change the problem itself.
 
 So, indicated with A the pound sold of Product A (same for B, C and D) , the **objective function** is:
 
@@ -112,7 +114,18 @@ We also have a time limit on each Machine, so the following constraint is also v
 2.50\cdot A + 1.20\cdot B + 2.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Planer}
 \end{align*}
 
+**************************************
+**************************************
+
 The model **with** the binary variables:
+
+In this case, the fixed cost is activated only in the case the specific Product is produced, and to do so we introduce binary variable $Y_i$ for $i=A,B,C,D$ defined as:
+
+\begin{align*}
+Y_i&=1 & \text{if } i>0\\
+Y_i&=0 & \text{if } i=0\\
+\text{where } &i=A,B,C,D
+\end{align*}
 
 The **objective function** in this case is:
 
@@ -127,26 +140,21 @@ The domain of the variables are:
 450 &\leq B \leq 650\\
 0 &\leq C \leq 120\\
 0 &\leq D \leq 150\\ 
-Y_i \in \{0,1\} &\text{ with } i=A,B,C,D 
+Y_i \in \{0,1\} &\text{ for } i=A,B,C,D 
 \end{align*}
 
-Based on the composition of the material in each Product and the limited resources we also have that:
+The following constraints are the same as the problem without the binary problem:
 
 \begin{align*}
 0.55 \cdot A + 0.45 \cdot B + 0.25 \cdot C + 1.00 \cdot D &\leq 1300 &\to &\text{Maximum Alminium}\\
-0.45 \cdot A + 0.55 \cdot B + 0.75 \cdot C + 0.00 \cdot D &\leq 900 &\to &\text{Maximum Copper}
-\end{align*}
-
-We also have a time limit on each Machine, so the following constraint is also valid:
-
-\begin{align*}
+0.45 \cdot A + 0.55 \cdot B + 0.75 \cdot C + 0.00 \cdot D &\leq 900 &\to &\text{Maximum Copper}\\
 1.20\cdot A + 1.00\cdot B + 1.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Forger}\\
 1.75\cdot A + 1.00\cdot B + 1.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Reamer}\\
 1.30\cdot A + 0.60\cdot B + 0.40 \cdot C + 0.00\cdot D &\leq 3600 &\to &\text{Shaper}\\
 2.50\cdot A + 1.20\cdot B + 2.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Planer}
 \end{align*}
 
-Lastly we have the binary constraints:
+We have the linking constraints:
 
 \begin{align*}
 A \leq M_A Y_A \text{ with } &M_A = \min(1300/0.55,900/0.45,3600/1.2,3600/1.75,3600/1.3,3600/2.5)=1440\\
@@ -155,13 +163,13 @@ C \leq M_C Y_C \text{ with } &M_C = \min(1300/0.25,900/0.75,3600/1,3600/1,3600/0
 D \leq M_D Y_D \text{ with } &M_D = \min(1300/1,3600/1.5,3600/1.5,3600/1.5)=1300
 \end{align*}
 
-Additionally we want to produce a certain Product only if it is profitable after deducting the fixed cost so we will have:
+Additionally we decide to produce a certain Product only if it is profitable after deducting the fixed cost so we will have that the minimum quantity is *fixed cost*/*Margin profit per Pound*:
 
 \begin{align*}
-A &\geq 600/2.14\cdot Y_A = 280.24 Y_A\\
-B &\geq 500/1.13\cdot Y_B = 444.44 Y_B\\
-C &\geq 250/4\cdot Y_C = 62.5 Y_C\\
-D &\geq 300/2.12\cdot Y_D = 141.78 Y_D
+A &\geq 600/2.14\cdot Y_A = 280.24\cdot Y_A\\
+B &\geq 500/1.13\cdot Y_B = 444.44\cdot Y_B\\
+C &\geq 250/4\cdot Y_C = 62.5\cdot Y_C\\
+D &\geq 300/2.12\cdot Y_D = 141.78\cdot Y_D
 \end{align*}
 
 ## c. Create a executable model in R for this problem and solve it.
@@ -227,11 +235,14 @@ name.lp(model, "Alloy Corporation")
 print(model) #To see to model
 ```
 
+************************************
+************************************
+
 Here is the implementation of problem defined above in point **b.** of bin_model in R:
 ```{r LP bin_model, results='hide', message=FALSE}
-bin_model = make.lp(0,8)                            # 8 Variables (A,B,C,D)
+bin_model = make.lp(0,8)                    # 8 Variables
 set.type(bin_model, c(5:8), "binary")
-lp.control(bin_model, sense = "max")                #Maximazing Problem
+lp.control(bin_model, sense = "max")        #Maximazing Problem
 set.objfn(bin_model,obj = c(2.141,1.125,4,2.116,-600,-500,-250,-300))   #Objective function coefficients
 
 
@@ -277,25 +288,25 @@ add.constraint(bin_model,
                xt = c(1,-1440),
                type = "<=",
                rhs = 0,
-               indices = c(1,5)) #binary contraint for A
+               indices = c(1,5)) #linking contraint for A
 
 add.constraint(bin_model,
                xt = c(1,-1636.36),
                type = "<=",
                rhs = 0,
-               indices = c(2,6)) #binary contraint for B
+               indices = c(2,6)) #linking contraint for B
 
 add.constraint(bin_model,
                xt = c(1,-1200),
                type = "<=",
                rhs = 0,
-               indices = c(3,7)) #binary contraint for C
+               indices = c(3,7)) #linking contraint for C
 
 add.constraint(bin_model,
                xt = c(1,-1300),
                type = "<=",
                rhs = 0,
-               indices = c(4,8)) #binary contraint for D
+               indices = c(4,8)) #linking contraint for D
 
 add.constraint(bin_model,
                xt = c(-1,280.24),
@@ -322,15 +333,16 @@ add.constraint(bin_model,
                indices = c(4,8)) #min contraint for D
 
 #Setting lower and upper bounds
-set.bounds(bin_model,lower = c(1200,450,0,0,0,0,0,0), upper = c(Inf,650,120,150,1,1,1,1)) 
+set.bounds(bin_model, lower = c(1200,450,0,0,0,0,0,0), 
+                      upper = c(Inf,650,120,150,1,1,1,1)) 
 
 row.add.mode(bin_model,"off")
 
 #Giving names to the contraints and variables
 dimnames(bin_model)<- list(c("Aluminium","Copper","Forger","Reamer","Shaper","Planer",
-                             "Binary A","Binary B","Binary C","Binary D",
+                             "Linking A","Linking B","Linking C","Linking D",
                              "Min Bin A","Min Bin B","Min Bin C","Min Bin D"),
-                           c("A","B","C","D","YA","YB","YC","YD"))
+                           c("A","B","C","D","Y_A","Y_B","Y_C","Y_D"))
 name.lp(bin_model, "Alloy Corporation Binary Problem")
 ```
 
@@ -339,7 +351,7 @@ print(bin_model)
 ```
 ## d. What is the optimal solution?
 
-We use the solve() function to solve the model:
+We use the solve() function to solve the **model**:
 ```{r LP model solution}
 solve(model) #result = 0 -> solved
 
@@ -353,7 +365,8 @@ cat("The optimal objective function value is: ",get.objective(model), "\n",
     "Thus the optimal net profit value is",get.objective(model) - fixed_cost)
 ```
 
-We use the solve() function to solve the bin_model:
+We use the solve() function to solve the **bin_model**:
+
 ```{r LP bin_model solution}
 solve(bin_model) #result = 0 -> solved
 
@@ -366,8 +379,11 @@ cat("The optimal variables values are:","\n",
 
 cat("The optimal objective function value is: ",get.objective(bin_model))
 ```
+In the case of fixed cost activation only on production, if we don't use the binary variable, we see that the the result given without is binary problem will be $1545.45+300=1845.45$ (Since it didn't produce Product D), which is way off the optimal solution of $2031.7$.
 
 ## e. Perform the sensitivity analysis for this solution and answer the following questions.
+
+***From here on we will consider only the non binary model*** 
 
 ```{r sensitivity function, include=FALSE}
 require(dplyr)
@@ -437,9 +453,10 @@ We have that the base remains if the coeffiecient are in the following range:
 2.821  &\leq C_3 < +\infty\\
 -\infty &< C_4 < 3\\
 \end{align*}
-The fact that $C_1$ and $C_2$ can decrease all they want is due to the fact that the optimal solution satisfies the minimum constraint given for Product A and B, thus if we were to decrease the marginal profit per pound from how it is now, we will have that it still needs to satify the minimum quantity for Product A and B, so the solution will not change.<br>\newline
-A similar argument applies for the coefficient $C_4$ of Product D, if we decrease $C_4$ the solution will not change since we will continue to not produce the Product C with the given constraints.<br>\newline
-While for the coefficient $C_3$  if we increase it, since we produce only the product C, because the most profitable while satifying the given contraints even if we increased the obtained profit we will have that the optimal solution will not change.
+The fact that $C_1$ and $C_2$ can decrease all they want is due to the fact that the optimal solution satisfies the minimum constraint given for Product A and B, thus if we decrease the marginal profit per pound from how it is now, the problem still needs to satify the minimum quantity for Product A and B, so the solution will not change.<br>\newline
+A similar argument applies for the coefficient $C_4$ of Product D, if we decrease $C_4$ the solution will not change since we will continue to not produce the Product D with the given constraints.<br>\newline
+While for the coefficient $C_3$  if we increase it, since we produce only the product C, because it's the most profitable while satifying the given contraints even if we increased the obtained profit we will have that the optimal solution will not change, but if we reduce $C_3$ too much it might change the optimal solution.
+
 ```{r sensitivity analysis RHS}
 printSensitivityRHS(model)
 ```
@@ -459,12 +476,12 @@ The last contraint (Planer Time) has a shadow price of 2, which means that every
 
 ## f. Is the solution degenerate?
 
-There are two was of checking if a solution is degenrate, the first one is using the theory: we have that since no constraint has an allowable increase or decrease $= 0$, the solution is not degenerate.<br>\newline
+There are two was of checking if a solution is degenrate, the first one is using the theory: since no constraint has an allowable increase or decrease $= 0$, the solution is not degenerate.<br>\newline
 Another way is using the value of the following function:
 ```{r degenerate}
 solve.lpExtPtr(model)
 ```
-If the function has a value of 4 it means that the solution is degenerate, while 0 means that the optimal solution is found. In this case the value of the function confirms that the solution is not degenerate.
+In the function description it is stated that if the result of the function has value 4, it means that the solution is degenerate, while 0 means that the optimal solution is found. In this case the value of the function confirms that the solution is not degenerate.
 
 ## g. Is the solution unique?
 
@@ -484,7 +501,7 @@ kable(data.frame("Variables"=c("A","B","C","D"),
            "Reduced_Cost"=red_cost))
 ```
 
-One would be tempted to use the marginal profit per Pound, in this case he/she would recommend decreasing the Production of the Product B, in order to allocate the resources for a more profitable Product, but using the Reduced Cost we can see that the Product which will gain us more value reducing its production is the Product A with a reduce cost of $2.859$.
+One would be tempted to use the marginal profit per Pound, in this case he/she would recommend decreasing the Production of the Product B, in order to allocate the resources for a more profitable Product, but we can see that, using the Reduced Cost the Product which will gain us more value reducing its production is the Product A with a reduce cost of $2.859-$.
 
 ## i. If MNC wanted to increase the production of any product, which one would you recommend and why?
 
