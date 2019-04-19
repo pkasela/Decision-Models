@@ -126,30 +126,6 @@ add.constraint(bin_model,
                rhs = 0,
                indices = c(4,8)) #linking contraint for D
 
-add.constraint(bin_model,
-               xt = c(-1,280.24),
-               type = "<=",
-               rhs = 0,
-               indices = c(1,5)) #min contraint for A
-
-add.constraint(bin_model,
-               xt = c(-1,444.44),
-               type = "<=",
-               rhs = 0,
-               indices = c(2,6)) #min contraint for B
-
-add.constraint(bin_model,
-               xt = c(-1,62.5),
-               type = "<=",
-               rhs = 0,
-               indices = c(3,7)) #min contraint for C
-
-add.constraint(bin_model,
-               xt = c(-1,141.78),
-               type = "<=",
-               rhs = 0,
-               indices = c(4,8)) #min contraint for D
-
 #Setting lower and upper bounds
 set.bounds(bin_model, lower = c(1200,450,0,0,0,0,0,0), 
            upper = c(Inf,650,120,150,1,1,1,1)) 
@@ -158,8 +134,7 @@ row.add.mode(bin_model,"off")
 
 #Giving names to the contraints and variables
 dimnames(bin_model)<- list(c("Aluminium","Copper","Forger","Reamer","Shaper","Planer",
-                             "Linking A","Linking B","Linking C","Linking D",
-                             "Min Bin A","Min Bin B","Min Bin C","Min Bin D"),
+                             "Linking A","Linking B","Linking C","Linking D"),
                            c("A","B","C","D","Y_A","Y_B","Y_C","Y_D"))
 name.lp(bin_model, "Alloy Corporation Binary Problem")
 
