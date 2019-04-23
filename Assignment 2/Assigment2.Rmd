@@ -2,10 +2,10 @@
 title: "Assigment 2 - Alloy Corporation"
 author: "Pranav Kasela - 846965"
 output:
-  html_document:
-    df_print: paged
   pdf_document:
     fig_caption: yes
+  html_document:
+    df_print: paged
 ---
 
 # Introduction
@@ -58,7 +58,11 @@ l. If the marketing department wanted to decrease the price of the A product by 
 
 **We don't agree with the controller's recommendation**, using the current financial summary of Products, the *Product B* has negative net profit (-0.12 per Pound) while the *Product C* has positive net profit (1.5 per Pound).
 If we used the net profit as a performance measure of the products, which implies that the demand of the products will not change in the future, the controller would right on the cessation of the production of the *Product B* but not of the *Product C*.<br> \newline 
-But as we can see that the demand of the *Product B* changed, using the current minimum demand for the product B, the net profit is atleast *minimun quantity*$\cdot$*Margin profit per Pound*(From the table below)$-$*Fixed Costs* = $1.125*450 - 500 = 6.25 > 0$ which is positive thus profitable, but it is a small profit. If we could allocate the resources spent for the Product B in other more profitable Products, such as Product C, we will have a better profit since the marginal profit for the Product B is the lowest one ($1.13$) but we need also to check the reduced cost for the Product B in our problem, it may consume less resources to produce, so for example with the same Resources with we produce a single unit of Product_X, we could produce more units of Product B, thus making it more profitable than the other Product_X.<br>\newline
+But as we can see that the demand of the *Product B* changed, using the current minimum demand for the product B, the net profit is atleast 
+\begin{align*}
+&\text{minimun quantity}\cdot \text{Margin profit per Pound}\text{(From the table below)}-\text{Fixed Costs} =\\ &=1.125\cdot 450 - 500 = 6.25 > 0
+\end{align*}
+which is positive thus profitable, but it is a small profit. If we could allocate the resources spent for the Product B in other more profitable Products, such as Product C, we will have a better profit since the marginal profit for the Product B is the lowest one ($1.13$) but we need also to check the reduced cost for the Product B in our problem, it may consume less resources to produce, so for example with the same Resources with we produce a single unit of Product_X, we could produce more units of Product B, thus making it more profitable than the other Product_X.<br>\newline
 The interruption in the production of the *Product B* is still arguable and depends a lot also on the market request, but in the case of the *Product C* we see that the marginal profit per Pound is $4.00$, and it has a fixed cost of only $250$, lowest one in all four products, thus we need to produce only $62.5$ pounds of Product C to have a profit, as long as this demand is satisfied (in the last quarter it was satified) there is no need to interrupt the production of the Product C. 
 
 
@@ -66,7 +70,10 @@ The interruption in the production of the *Product B* is still arguable and depe
 
 **We create two different models one using the binary variable (called bin_model) and the other one without using the binary variables (called model)**
 
-Our objective is to maximize the profit, for that we define the *Margin Profit* as the *Sales Revenue*-*Variable Costs* and the Margin Profit per Pound as *Margin Profit*/*Pounds Sold*.
+Our objective is to maximize the profit, for that we define the *Margin Profit* as the 
+$$\text{Sales Revenue}-\text{Variable Costs}$$ and the Margin Profit per Pound as 
+$$\frac{\text{Margin Profit}}{\text{Pounds Sold}}$$
+The values are shown in the following table:
 ```{r table 1, echo=FALSE}
 library(knitr)
 
@@ -79,9 +86,9 @@ D <- c("879","350","529","250","2.12")
 kable(data.frame(Product,A,B,C,D))
 ```
 
-We start by the one **without** the binary variables:
+We formulate the model **without** the binary variables:
 
-In this case we ignore the fixed costs because if we included them, since they are constant, they will be overlooked by the problem, so will not change the problem itself.
+In this case we ignore the fixed costs because if we included them, since they are constant, they will be overlooked by the problem and will not change the problem itself.
 
 We indicate with A the pound sold of Product A (same for B, C and D) , the **objective function**, we want to **maximize**, is:
 
@@ -101,7 +108,7 @@ The domain of the variables are:
 Based on the composition of the material in each Product and the limited resources we also have that:
 
 \begin{align*}
-0.55 \cdot A + 0.45 \cdot B + 0.25 \cdot C + 1.00 \cdot D &\leq 1300 &\to &\text{Maximum Alminium}\\
+0.55 \cdot A + 0.45 \cdot B + 0.25 \cdot C + 1.00 \cdot D &\leq 1300 &\to &\text{Maximum Aluminium}\\
 0.45 \cdot A + 0.55 \cdot B + 0.75 \cdot C + 0.00 \cdot D &\leq 900 &\to &\text{Maximum Copper}
 \end{align*}
 
@@ -120,12 +127,13 @@ We also have a time limit on each Machine, so the following constraint is also v
 The model **with** the binary variables:
 
 In this case, the fixed cost is activated only in the case the specific Product is produced, and to do so we introduce binary variable $Y_i$ for $i=A,B,C,D$ defined as:
-
-\begin{align*}
-Y_i&=1 & \text{if } i>0\\
-Y_i&=0 & \text{if } i=0\\
-\text{where } &i=A,B,C,D
-\end{align*}
+\[
+Y_i=\begin{cases}
+1 &\text{if } i>0\\
+0 &\text{if } i=0\\
+\end{cases}\\
+\text{where } i=A,B,C,D
+\]
 
 The **objective function** to **maximize** in this case is:
 
@@ -146,7 +154,7 @@ Y_i \in \{0,1\} &\text{ for } i=A,B,C,D
 The following constraints are the same as the problem without the binary problem:
 
 \begin{align*}
-0.55 \cdot A + 0.45 \cdot B + 0.25 \cdot C + 1.00 \cdot D &\leq 1300 &\to &\text{Maximum Alminium}\\
+0.55 \cdot A + 0.45 \cdot B + 0.25 \cdot C + 1.00 \cdot D &\leq 1300 &\to &\text{Maximum Aluminium}\\
 0.45 \cdot A + 0.55 \cdot B + 0.75 \cdot C + 0.00 \cdot D &\leq 900 &\to &\text{Maximum Copper}\\
 1.20\cdot A + 1.00\cdot B + 1.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Forger}\\
 1.75\cdot A + 1.00\cdot B + 1.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Reamer}\\
@@ -154,13 +162,13 @@ The following constraints are the same as the problem without the binary problem
 2.50\cdot A + 1.20\cdot B + 2.00 \cdot C + 1.50\cdot D &\leq 3600 &\to &\text{Planer}
 \end{align*}
 
-We have the linking constraints:
+We have the linking constraints to link the activation variables, $Y_A,Y_B,Y_C,Y_D$, to the quantity variable $A,B,C,D$ respectively, where the $M$ is chosen to be the maximum value that a certain Product can achieve:
 
 \begin{align*}
 A \leq M_A Y_A \text{ with } &M_A = \min(1300/0.55,900/0.45,3600/1.2,3600/1.75,3600/1.3,3600/2.5)=1440\\
-B \leq M_B Y_B \text{ with } &M_B = \min(1300/0.45,900/0.55,3600/1,3600/1,3600/0.6,3600/1.2)=1636.36\\
-C \leq M_C Y_C \text{ with } &M_C = \min(1300/0.25,900/0.75,3600/1,3600/1,3600/0.4,3600/2)=1200\\
-D \leq M_D Y_D \text{ with } &M_D = \min(1300/1,3600/1.5,3600/1.5,3600/1.5)=1300
+B \leq M_B Y_B \text{ with } &M_B = \min(1300/0.45,900/0.55,3600/1,3600/1,3600/0.6,3600/1.2,650)=650\\
+C \leq M_C Y_C \text{ with } &M_C = \min(1300/0.25,900/0.75,3600/1,3600/1,3600/0.4,3600/2,120)=120\\
+D \leq M_D Y_D \text{ with } &M_D = \min(1300/1,3600/1.5,3600/1.5,3600/1.5,150)=150
 \end{align*}
 
 ## c. Create a executable model in R for this problem and solve it.
@@ -232,9 +240,13 @@ print(model) #To see to model
 Here is the implementation of problem defined above in point **b.** of bin_model in R:
 ```{r LP bin_model, results='hide', message=FALSE}
 bin_model = make.lp(0,8)                    # 8 Variables
+
 set.type(bin_model, c(5:8), "binary")
+
 lp.control(bin_model, sense = "max")        #Maximazing Problem
-set.objfn(bin_model,obj = c(2.141,1.125,4,2.116,-600,-500,-250,-300))   #Objective function coefficients
+
+#Objective function coefficients
+set.objfn(bin_model,obj = c(2.141,1.125,4,2.116,-600,-500,-250,-300))   
 
 
 row.add.mode(bin_model,"on")
@@ -282,19 +294,19 @@ add.constraint(bin_model,
                indices = c(1,5)) #linking contraint for A
 
 add.constraint(bin_model,
-               xt = c(1,-1636.36),
+               xt = c(1,-650),
                type = "<=",
                rhs = 0,
                indices = c(2,6)) #linking contraint for B
 
 add.constraint(bin_model,
-               xt = c(1,-1200),
+               xt = c(1,-120),
                type = "<=",
                rhs = 0,
                indices = c(3,7)) #linking contraint for C
 
 add.constraint(bin_model,
-               xt = c(1,-1300),
+               xt = c(1,-150),
                type = "<=",
                rhs = 0,
                indices = c(4,8)) #linking contraint for D
@@ -346,7 +358,7 @@ cat("The optimal variables values are:","\n",
 
 cat("The optimal objective function value is: ",get.objective(bin_model))
 ```
-In the case the fixed cost is activated only on production, if we don't use the binary variable, we see that the the result given without is binary problem will be $1545.45+300=1845.45$ (Since it didn't produce Product D), which is way off the optimal solution of $2031.7$ using the binary variables.
+In the case the fixed cost is activated only on production, if we don't use the binary variable, we see that the the result given without is binary problem will be $1545.45+300=1845.45$ (we add 300 the fixed cost for product D because it wasn't produced), which is way off the optimal solution of $2031.7$ using the binary variables.
 
 ## e. Perform the sensitivity analysis for this solution and answer the following questions.
 
@@ -428,7 +440,7 @@ While for the coefficient $C_3$  if we increase it, since we produce only the pr
 printSensitivityRHS(model)
 ```
 
-So we have the the dual variables are $$y_i = 0, \forall i=1,...,5$$ and $$y_6=2$$ and the interval for the resources are:
+So we have the the dual variables (or shadow prices) are $$y_i = 0, \forall i=1,...,5$$ and $$y_6=2$$ and the interval for the resources are:
 \begin{align*}
 -\infty &< b_1 < +\infty\\
 -\infty &< b_2 < +\infty\\
@@ -468,22 +480,28 @@ kable(data.frame("Variables"=c("A","B","C","D"),
            "Reduced_Cost"=red_cost))
 ```
 
-One would be tempted to use the marginal profit per Pound, in this case he/she would recommend decreasing the Production of the Product B, in order to allocate the resources for a more profitable Product and using a similar idea as we mentioned in the point **a.**, but we can see that, using the Reduced Cost the Product which will gain us more value reducing its production is the Product A with a reduce cost of $-2.859$.
+One would be tempted to use the marginal profit per Pound, in this case he/she would recommend decreasing the Production of the Product B, in order to allocate the resources for a more profitable Product and using a similar idea as we mentioned in the point **a.**, but we can see that, using the Reduced Cost the Product which will gain us more value reducing its production is the Product A with a reduce cost of $-2.859$. So the recommended product is Product A in this case.
 
 ## i. If MNC wanted to increase the production of any product, which one would you recommend and why?
 
-In this case we would recommend the increase in production of the Product C, which is the most profitable one. All the other Products have a negative Reduced Cost, so increasing their Production will decrease the Net Profit since the consumed resources by them will reduce the quantity produced of Product C.
+In this case we would recommend the increase in production of the Product C, which is the most profitable one. All the other Products have a negative Reduced Cost. But to do so we need to increase the limits of the binding constaints, which will be explained in the next point.
 
 ## j. Which resources are preventing MNS from making more money? If they could acquire more of this resource how much should they acquire & how much should they be willing to pay to acquire it?
 
 ```{r constraint values}
-get.constraints(model)
+achieved_value <- get.constraints(model)
+maximum_value <- c(1300,900,3600,3600,3600,3600)
+constraint_name <- c("Aluminium Quantity","Copper Quantity","Forger Time","Reamer Time","Shaper Time","Planer Time")
+kable(data.frame(constraint_name, maximum_value, achieved_value))
 ```
+
 The Planer time is the only resource which is preventing us to produce more products (because it's final value is $=3600$ which is the maximum value it can have), since it's shadow price is $y_6=2$, if we buy $\Delta_6=180$ minutes more (which is the maximum amount that can be purchases without changing the optimal solution), the value of the function will increase by $y_6 \times \Delta_6 = 2 \times 180 = 360$. So the company must pay at most 360 to increase the time by $180$ minutes in the Planer machine.
+
+All the other resources are non-binding thus it is useless to acquire more of them.
 
 ## k. How much should MNC be willing to pay to acquire more copper?
 
-From the point **j.** we can see that the quantity of Copper used is 810, while the company has an available quantity of 900, thus MNC doesn't need more copper, so the answer is 0. 
+From the point **j.** we can see that the quantity of Copper used is 810, while the company has an available quantity of 900, thus MNC doesn't need more copper, so the answer is 0.
 
 ## l. If the marketing department wanted to decrease the price of the A product by $0.25, would the optimal solution change?
 
