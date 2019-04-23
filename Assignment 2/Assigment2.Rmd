@@ -434,7 +434,7 @@ We have that the base remains if the coeffiecient are in the following range:
 \end{align*}
 The fact that $C_1$ and $C_2$ can decrease all they want is due to the fact that the optimal solution satisfies the minimum constraint given for Product A and B, thus if we decrease the marginal profit per pound from how it is now, the problem still needs to satify the minimum quantity for Product A and B, so the solution will not change.<br>\newline
 A similar argument applies for the coefficient $C_4$ of Product D, if we decrease $C_4$ the solution will not change since we will continue to not produce the Product D with the given constraints.<br>\newline
-While for the coefficient $C_3$  if we increase it, since we produce only the product C, because it's the most profitable while satifying the given contraints even if we increased the obtained profit we will have that the optimal solution will not change, but if we reduce $C_3$ too much it might change the optimal solution.
+While for the coefficient $C_3$  if we increase it, since it's the most profitable while satifying the given contraints, we will have that the optimal solution will not change, but if we reduce $C_3$ it might change the optimal solution.
 
 ```{r sensitivity analysis RHS}
 printSensitivityRHS(model)
