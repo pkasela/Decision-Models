@@ -1,0 +1,105 @@
+---
+title: "Assignment 3 - The free position facility location problem"
+author: "Pranav Kasela $846965$"
+course: "Decision Models"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+    toc: yes
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: vignette
+    toc: yes
+    toc_depth: 5
+    df_print: paged
+---
+
+
+## The Problem
+
+In this assignment we will look at the **Facility Location Problem**. 
+The problem can be described in general terms as follows: 
+
+We must decide the placement of  a facility that distributes a certain good to a group of consumers that need it.
+
+The placement must to be chosen  in order to **minimize** the total compound distance from the facility and the customers. 
+
+The following assumptions has to be taken into account:
+
+1. The possible location for the facility is unknown, that is the problem is to find the right spot to build it.
+2. The facility building costs are fixed and  independent from the position of the building site. 
+ 
+
+
+Notice that  in this scenario  there is one possible decision to make: 
+
+- where to build the facility, that is find the position ($\chi$, $\upsilon$) that minimises the compound distance of the facility with respect to all custumers.
+
+### Data
+
+A file with the locations of the consumers can be  found in  the `Data` folder. 
+
+## Distance function
+
+Given the position of the facility $f= (\chi, \upsilon)$ and of a consumer $p_i=(x_i, y_i)$ use the following formula to calculate the distance between them. 
+
+$$
+d(f,p_i) = log((\chi-x_i)^2+1) + log((\upsilon-y_i)^2+1)
+$$
+
+## The assignment and the solution
+
+1. Formulate the objective function to minimize for the described problem. 
+
+```{r functions, include=FALSE}
+# A function for captioning and referencing images
+fig <- local({
+    i <- 0
+    ref <- list()
+    list(
+        cap=function(refName, text) {
+            i <<- i + 1
+            ref[[refName]] <<- i
+            paste("Figure ", i, ": ", text, sep="")
+        },
+        ref=function(refName) {
+            ref[[refName]]
+        })
+})
+``` 
+
+```{r load_dataset,fig.align='center', fig.cap=paste("Customers Location Distribution")}
+library(ggplot2)
+
+customer_locations <- read.csv("consumer_locations.csv")
+
+ggplot(customer_locations, aes(x=x,y=y)) +
+  geom_point() + 
+  theme(axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text  = element_blank(),
+        panel.grid = element_blank())
+
+distance <- function(p1,p2){
+  log((p1[,"x"]-p2[,"x"])^2+1) + log((p1[,"y"]-p2[,"y"])^2+1)
+}
+
+```
+
+Our Problem in this case is to minimize the function:
+\begin{align*}
+\text{min}& &\sum_{j=1}^n \text{distance}(P,p_j)
+\end{align*}
+Wehre $P$ is the location of the facility while $p_j$ is the location of the j-th customer.
+
+2. Express in analytical form the gradient for the objective to minimize.
+3. Implement the `Gradiend Descent method` and solve the problem with it.
+4. Solve the problem with a package provided by R (for instance, using the function `optimr` within the package `optimx`). Note that it is not required to use the `gradient descent` algorithm to solve the problem, other algorithms can be used as well.
+5. Implement the `Stochastic gradient descent` algorithm with mini-batches and use it to solve the problem. 
+
+
+
+
+
+
