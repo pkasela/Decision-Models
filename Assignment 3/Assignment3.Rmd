@@ -3,10 +3,10 @@ title: "Assignment 3 - The free position facility location problem"
 author: "Pranav Kasela $846965$"
 course: "Decision Models"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
     toc: yes
+  pdf_document: default
   prettydoc::html_pretty:
     theme: architect
     highlight: vignette
@@ -52,51 +52,106 @@ $$
 
 1. Formulate the objective function to minimize for the described problem. 
 
-```{r functions, include=FALSE}
-# A function for captioning and referencing images
-fig <- local({
-    i <- 0
-    ref <- list()
-    list(
-        cap=function(refName, text) {
-            i <<- i + 1
-            ref[[refName]] <<- i
-            paste("Figure ", i, ": ", text, sep="")
-        },
-        ref=function(refName) {
-            ref[[refName]]
-        })
-})
-``` 
-
-```{r load_dataset,fig.align='center', fig.cap=paste("Customers Location Distribution")}
+```{r load_dataset,fig.align='center'}
 library(ggplot2)
 
 customer_locations <- read.csv("consumer_locations.csv")
 
 ggplot(customer_locations, aes(x=x,y=y)) +
   geom_point() + 
-  theme(axis.title = element_blank(),
-        axis.ticks = element_blank(),
+  ggtitle("Customers' Location Distribution") +
+  theme(axis.ticks = element_blank(),
         axis.text  = element_blank(),
-        panel.grid = element_blank())
-
-distance <- function(p1,p2){
-  log((p1[,"x"]-p2[,"x"])^2+1) + log((p1[,"y"]-p2[,"y"])^2+1)
-}
-
+        panel.grid = element_blank(),
+        axis.title = element_blank(),
+        plot.title = element_text(hjust = 0.5))
 ```
 
 Our Problem in this case is to minimize the function:
+
 \begin{align*}
-\text{min}& &\sum_{j=1}^n \text{distance}(P,p_j)
+\text{min}& &f(\bar{P})=\sum_{j=1}^n \text{distance}(\bar{P},\bar{p}_j)
 \end{align*}
-Wehre $P$ is the location of the facility while $p_j$ is the location of the j-th customer.
+
+Where $\bar{P}$ is the location of the facility while $\bar{p}_j$ is the location of the j-th customer, with the distance as defined above.
 
 2. Express in analytical form the gradient for the objective to minimize.
+
+We start calculating the gradient of the function $f(\bar{P})=f(\chi,\upsilon)$:
+
+\[
+\nabla = \Big(\sum_i \dfrac{2(\chi-x_i)}{(\chi-x_i)^2 +1},\sum_i \dfrac{2(\upsilon-y_i)}{(\upsilon-y_i)^2 +1}\Big)
+\]
+
 3. Implement the `Gradiend Descent method` and solve the problem with it.
+
+```{r gradient descendet}
+fun.gr <- function(P){
+  c = customer_locations
+  c(sum(2*(P[1]-c[,1])/((P[1]-c[,1])^2 +1)),
+    sum(2*(P[2]-c[,2])/((P[2]-c[,2])^2 +1)))
+}
+
+# gradient descent function
+gradientDescent <- function(par.init, fun.gr, lr, iters){
+  par  <- matrix(NA, nrow = iters+1, ncol = 2)
+  loss <- matrix(NA, nrow = iters+1, ncol = 2)
+  par[1,] <- par.init
+  for(k in 1:iters){
+    loss[k,] <- fun.gr(par[k,])
+    par[k+1,] <- par[k,] - lr*loss[k,]
+  }
+  return(list(par = par))
+}
+P <- gradientDescent(c(mean(customer_locations[,1]),mean(customer_locations[,2])),fun.gr,lr = 20,iters = 1000)
+P$par[1001,]
+```
+
+```{r 3D plot of function}
+fn.distance <- function(p1){
+  #p1=data.frame(x=x,y=y)
+  p2=customer_locations
+  sum(log((p1[1]-p2[,"x"])^2+1) + log((p1[2]-p2[,"y"])^2+1))
+}
+
+helper.loss <- function(m,c){ #m and c are vectors
+dist = matrix(nrow = length(m),ncol = length(c))
+for (i in seq(1, length(m), by = 1)) {
+ for (j in seq(1, length(c), by = 1)) {
+   dist[i,j] = fn.distance(c(m[i], c[j]))   
+ } 
+}
+dist
+}
+
+x=seq(0, 100, 1)
+y=seq(0, 100, 1)
+#z <- helper.loss(x,y)
+
+#persp(x, y, z, phi = 30, theta = 60,col = "orange",xlab = "x",ylab = "y", zlab = "Distance Function", r=10, d=5)
+
+#contour(x,y,z, xlab="y",ylab="y")
+```
+
+
 4. Solve the problem with a package provided by R (for instance, using the function `optimr` within the package `optimx`). Note that it is not required to use the `gradient descent` algorithm to solve the problem, other algorithms can be used as well.
+
+```{r,message=F}
+require(optimx)
+```
+
+```{r optimr solution}
+strt <- c(median(customer_locations[,1]), median(customer_locations[,2]))
+ansfgh <- optimr(par = strt, fn = fn.distance, gr = fun.gr,  method="CG")
+proptimr(ansfgh) 
+```
+
+
 5. Implement the `Stochastic gradient descent` algorithm with mini-batches and use it to solve the problem. 
+
+```{r Stochastic gradient}
+
+```
 
 
 
