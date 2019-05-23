@@ -86,34 +86,46 @@ We start calculating the gradient of the function $f(\bar{P})=f(\chi,\upsilon)$:
 3. Implement the `Gradiend Descent method` and solve the problem with it.
 
 ```{r gradient descendet}
-fun.gr <- function(P){
-  c = customer_locations
-  c(sum(2*(P[1]-c[,1])/((P[1]-c[,1])^2 +1)),
-    sum(2*(P[2]-c[,2])/((P[2]-c[,2])^2 +1)))
-}
-
-# gradient descent function
-gradientDescent <- function(par.init, fun.gr, lr, iters){
-  par  <- matrix(NA, nrow = iters+1, ncol = 2)
-  loss <- matrix(NA, nrow = iters+1, ncol = 2)
-  par[1,] <- par.init
-  for(k in 1:iters){
-    loss[k,] <- fun.gr(par[k,])
-    par[k+1,] <- par[k,] - lr*loss[k,]
-  }
-  return(list(par = par))
-}
-P <- gradientDescent(c(mean(customer_locations[,1]),mean(customer_locations[,2])),fun.gr,lr = 20,iters = 1000)
-P$par[1001,]
-```
-
-```{r 3D plot of function}
 fn.distance <- function(p1){
   #p1=data.frame(x=x,y=y)
   p2=customer_locations
   sum(log((p1[1]-p2[,"x"])^2+1) + log((p1[2]-p2[,"y"])^2+1))
 }
 
+fun.gr <- function(P){
+  cl = customer_locations
+  c(sum(2*(P[1]-cl[,1])/((P[1]-cl[,1])^2 +1)),
+    sum(2*(P[2]-cl[,2])/((P[2]-cl[,2])^2 +1)))
+}
+
+# gradient descent function
+gradientDescent <- function(par.init, fun.gr, lr, iters){
+  par     <- matrix(NA, nrow = iters+1, ncol = 2)
+  loss    <- matrix(NA, nrow = iters+1, ncol = 2)
+  par[1,] <- par.init
+  for(k in 1:iters){
+    loss[k,]  <- fun.gr(par[k,])
+    par[k+1,] <- par[k,] - lr*loss[k,]
+    #stop if the norm of the gradient is smaller the 1e-6 practically 0
+    if(sum(loss[k,]^2) < 1e-6)  
+      break
+  }
+  par = par[!is.na(rowSums(par)),]
+  distance <- apply(par,1,fn.distance)
+  return(list(par       = par,
+              dist      = distance,
+              opt_point = par[nrow(par),],
+              min_dist  = distance[length(distance)]))
+}
+
+ris <- gradientDescent(c(300,450),fun.gr,lr = 0.1,iters = 1000)
+P   <- ris$par
+P_dist <- ris$dist 
+plot(1:length(P_dist),P_dist,type = "l",xlab = "Iterations",ylab = "Distance Value")
+```
+
+
+```{r 3D plot of function}
 helper.loss <- function(m,c){ #m and c are vectors
 dist = matrix(nrow = length(m),ncol = length(c))
 for (i in seq(1, length(m), by = 1)) {
@@ -124,24 +136,78 @@ for (i in seq(1, length(m), by = 1)) {
 dist
 }
 
-x=seq(0, 100, 1)
-y=seq(0, 100, 1)
+x=seq(0, 1000, 2)
+y=seq(0, 1000, 2)
 #z <- helper.loss(x,y)
+
+#min(z)
+#apply(z,1,which.min)[1]
+#apply(z,2,which.min)[1]
 
 #persp(x, y, z, phi = 30, theta = 60,col = "orange",xlab = "x",ylab = "y", zlab = "Distance Function", r=10, d=5)
 
 #contour(x,y,z, xlab="y",ylab="y")
 ```
 
+```{r Multistart to find the optimal solution}
+x <- runif(1000,0,1000)
+y <- runif(1000,0,1000)
+random.points <- cbind(x,y)
+
+opt_points <- matrix(NA,ncol=2, nrow=length(x))
+distances  <- rep(NA,length(x))
+
+ris_temp = list()
+for (i in 1:nrow(random.points)){
+  strt           <- random.points[i,]
+  ris_temp[[i]]       <- gradientDescent(strt,fun.gr,lr = 0.1,iter = 1000)
+  opt_points[i,] <- ris_temp[[i]]$opt_point
+  distances[i]   <- ris_temp[[i]]$min_dist
+}
+
+#ris_temp[[which.min(distances)]]
+
+distances[which.min(distances)]
+opt_points[which.min(distances),]
+```
+
 
 4. Solve the problem with a package provided by R (for instance, using the function `optimr` within the package `optimx`). Note that it is not required to use the `gradient descent` algorithm to solve the problem, other algorithms can be used as well.
+
+```{r}
+
+fun.gr <- function(X,y,P){
+  cl = cbind(X,y)
+  c(sum(2*(P[1]-cl[,1])/((P[1]-cl[,1])^2 +1)),
+    sum(2*(P[2]-cl[,2])/((P[2]-cl[,2])^2 +1)))
+}
+
+require(curry)
+
+#fun.gr <- curry(curry(fun.gr,customer_locations$x),customer_locations$y)
+X=customer_locations$x
+y=customer_locations$y
+
+fun1.gr <- curry(curry(fun.gr,X),y)
+
+fun1.gr(c(1,1))
+
+fun.gr <- function(P){
+  cl = customer_locations
+  c(sum(2*(P[1]-cl[,1])/((P[1]-cl[,1])^2 +1)),
+    sum(2*(P[2]-cl[,2])/((P[2]-cl[,2])^2 +1)))
+}
+
+fun.gr(c(1,1))
+```
+
 
 ```{r,message=F}
 require(optimx)
 ```
 
 ```{r optimr solution}
-strt <- c(median(customer_locations[,1]), median(customer_locations[,2]))
+strt   <- c(median(customer_locations[,1]), median(customer_locations[,2]))
 ansfgh <- optimr(par = strt, fn = fn.distance, gr = fun.gr,  method="CG")
 proptimr(ansfgh) 
 ```
@@ -150,7 +216,46 @@ proptimr(ansfgh)
 5. Implement the `Stochastic gradient descent` algorithm with mini-batches and use it to solve the problem. 
 
 ```{r Stochastic gradient}
+fun.gr <- function(cl,P){
+  c(sum(2*(P[1]-cl[,1])/((P[1]-cl[,1])^2 +1)),
+    sum(2*(P[2]-cl[,2])/((P[2]-cl[,2])^2 +1)))
+}
 
+stoch_gradDescent <- function(dataset,P.init, fun.gr, lr, iters){
+  xy <- dataset
+  # set matrix theta and set all elements = 0 to start with
+  beta <- P.init
+    
+  # Initialize a matrix to store values of beta for each iteration
+  P <- matrix(NA, nrow = iters + 1, ncol = 2)
+  P[1,] <- beta
+  # set seed value for random sampling
+  set.seed(42)
+    
+  # now iterate using mini batches of randomly sampled  data, updating theta each step
+  for (i in 2:iters+1) {
+    # randomly sample 5 items from the combined xy data frame
+    xysamp <- xy[sample(nrow(xy), floor(nrow(xy)*0.3), 
+                                  replace = TRUE), ]
+      
+    # update beta using mini batches
+    beta <- beta - lr  * fun.gr(xysamp, beta)
+      
+    # save the beta values for iteration i to a matrix for future plotting
+    P[i,] <- beta
+      
+ } # end for loop
+ return(P)
+}
+
+P = stoch_gradDescent(customer_locations,c(500,500),fun.gr,lr = 0.1,iter = 2000)
+
+P[2001,]
+
+ris <- apply(P,1, fn.distance)
+plot(1:2001,ris,type = "l")
+
+fun.gr(cl=customer_locations,c(1,2))
 ```
 
 
