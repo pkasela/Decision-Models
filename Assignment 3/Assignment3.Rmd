@@ -3,17 +3,17 @@ title: "Assignment 3 - The free position facility location problem"
 author: "Pranav Kasela $846965$"
 course: "Decision Models"
 output:
-  pdf_document: 
-    toc: yes
-  html_document:
-    df_print: paged
-    toc: yes
   prettydoc::html_pretty:
     theme: architect
     highlight: vignette
     toc: yes
     toc_depth: 5
     df_print: paged
+  html_document:
+    df_print: paged
+    toc: yes
+  pdf_document: 
+    toc: yes
   header-includes:
    - \usepackage{animate}
 ---
@@ -170,13 +170,12 @@ print.solution <- function(result){
   else
     converge <- "The method doesn't converge to the minimum."
  
-   msg  <- paste0(converge, " ",
-              "The minimum was the point of coordinates (",
-              round(P[1],2), ",",round(P[2],2),
-              ") and the value of the function is ", 
-              round(P_dist,2), " in ", result$iters,
-              " iterations.")
-  print(msg)
+   cat(paste0(" ",converge, " "),'\n',
+       paste0("The minimum is the point of coordinates (",
+       round(P[1],2), ",",round(P[2],2),
+       ")"),'\n',paste0("and the value of the function is ",
+       round(P_dist,2), " in ", result$iters,
+       " iterations."))
    
   ggplot(data=data.frame(distance=f_dist)) + 
     aes(x=distance) + 
@@ -189,7 +188,7 @@ print.solution <- function(result){
 
 Here is a first attempt to find a solution using the gradiente descendent method.
 
-```{r first attemt}
+```{r first attemt,fig.align='center'}
 res <- gradientDescent(c(runif(1,0,1000),runif(1,0,1000)),
                        fn.gr=fn.gr, lr = 0.1, 
                        max_iters = 1000, lr.decay = 0.001)
@@ -242,7 +241,8 @@ x=seq(400, 600, 5)
 y=seq(300, 500, 5)
 z <- helper.dist(x,y)
 
-persp(x, y, z, phi = 30, theta = 60,col = "orange",xlab = "x",ylab = "y", zlab = "Distance", r=10, d=5)
+persp(x, y, z, phi = 30, theta = 60,col = "orange",xlab = "x",
+      ylab = "y", zlab = "Distance", r=10, d=5)
 
 contour(x,y,z, xlab="y",ylab="y")
 ```
@@ -256,7 +256,8 @@ y <- runif(1000,0,1000)
 random.points <- cbind(x,y)
 
 ris_temp <- lapply(1:length(y), function(x) {
-  gradientDescent(random.points[x,],fn.gr,lr = 0.1,max_iters = 1000,lr.decay = 0.0001)})
+  gradientDescent(random.points[x,],fn.gr,lr = 0.1,
+                  max_iters = 1000,lr.decay = 0.0001)})
 
 opt_points <- matrix(NA,ncol=2, nrow=length(x))
 distances  <- rep(NA,length(x))
@@ -282,7 +283,8 @@ y <- rnorm(500,mean.y,sd.y)
 random.points <- cbind(x,y)
 
 ris_temp <- lapply(1:length(y), function(x) {
-  gradientDescent(random.points[x,],fn.gr,lr = 0.1,max_iters = 1000,lr.decay = 0.0001)})
+  gradientDescent(random.points[x,],fn.gr,lr = 0.1,
+                  max_iters = 1000,lr.decay = 0.0001)})
 
 opt_points <- matrix(NA,ncol=2, nrow=length(x))
 distances  <- rep(NA,length(x))
@@ -364,7 +366,7 @@ stoch_gradDescent <- function(xy,f.init, fun.gr, lr,
     # update point using mini batches
     f   <- f - lr  * fun.gr(xysamp, f)
     lr  <- lr.init * exp(-i*lr.decay)
-    # save the beta values for iteration i to a matrix for future plotting
+    # save the beta values for iteration i to a matrix for plotting
     P[i+1,]  <- f
     iter      <- i
     dist[i+1] <- fn.distance(P[i+1,])
@@ -406,11 +408,11 @@ for (i in 1:nrow(random.points)){
 f      <- ris_temp[[which.min(distances)]]$opt_point
 f_dist <- ris_temp[[which.min(distances)]]$min_dist
 P_dist <- ris_temp[[which.min(distances)]]$dist
-msg  <- paste0("The minimum is the point of coordinates (",
-              round(f[1],2), ",",round(f[2],2),
-              ") and the value of the function is ", 
-              round(f_dist,2))
-print(msg)
+
+cat(paste0("The minimum is the point of coordinates (",
+   round(f[1],2), ",",round(f[2],2),
+   ")"),'\n',paste0("and the value of the function is ",
+   round(f_dist,2)))
    
 ggplot(data=data.frame(distance=P_dist)) + 
   aes(x=distance) + 
