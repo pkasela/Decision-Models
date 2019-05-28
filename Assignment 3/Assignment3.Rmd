@@ -3,19 +3,19 @@ title: "Assignment 3 - The free position facility location problem"
 author: "Pranav Kasela $846965$"
 course: "Decision Models"
 output:
+  pdf_document: 
+    toc: yes
+    header-includes:
+   - \usepackage{animate}
+  html_document:
+    df_print: paged
+    toc: yes
   prettydoc::html_pretty:
     theme: architect
     highlight: vignette
     toc: yes
     toc_depth: 5
     df_print: paged
-  html_document:
-    df_print: paged
-    toc: yes
-  pdf_document: 
-    toc: yes
-  header-includes:
-   - \usepackage{animate}
 ---
 
 
@@ -75,16 +75,14 @@ require(dplyr)
 ```{r load_dataset,fig.align='center'}
 customer_locations <- read.csv("consumer_locations.csv")
 
-plt <-  ggplot(customer_locations, aes(x=x,y=y)) +
-        geom_point() + 
-        ggtitle("Customers' Location Distribution") +
-        theme(axis.ticks = element_blank(),
-            axis.text  = element_blank(),
-            panel.grid = element_blank(),
-            axis.title = element_blank(),
-            plot.title = element_text(hjust = 0.5))
-
-plt
+ggplot(customer_locations, aes(x=x,y=y)) +
+    geom_point() + 
+    ggtitle("Customers' Location Distribution") +
+    theme(axis.ticks = element_blank(),
+        axis.text  = element_blank(),
+        panel.grid = element_blank(),
+        axis.title = element_blank(),
+        plot.title = element_text(hjust = 0.5))
 ```
 
 We see that the points are randomly distributed among the plane, this indicates the the minimum of the function (the facility location) will not be near border otherwise the facility will be very far from the location on the opposite border. 
@@ -99,15 +97,36 @@ $$
 
 This gradient will be used in the numerical methods to search for a local minimum.
 
+We calculate the Hessian matrix as well, we will use it to determine if the stationary point found is a minimum:
+$$
+H=
+\begin{bmatrix}
+d_{\chi\chi}&d_{\chi\upsilon}\\d_{\upsilon\chi} & d_{\upsilon\upsilon}
+\end{bmatrix}
+=\\
+\begin{bmatrix}
+\sum_{i=1}^n\frac{2((\chi-x_i)^2+1) -4(\chi - x_i)^2}{((\chi-x_i)^2+1)^2} & 0\\
+0 & \sum_{i=1}^n \frac{2((\upsilon-y_i)^2+1) -4(\upsilon - y_i)^2}{((\upsilon - y_i)^2+1)^2}
+\end{bmatrix}
+$$
+
+Since it has a simple (diagonal) form we also immediatly know that it's inverse is:
+$$
+H^{-1}=
+\begin{bmatrix}
+\frac{1}{d_{\chi\chi}}&0\\0 & \frac{1}{d_{\upsilon\upsilon}}
+\end{bmatrix}
+$$
+
 ### 3. Implement the `Gradiend Descent method` and solve the problem with it.
 
-In the Gradient Descendent method, we decide to decay the learning rate (lr) with the number of iterations, based also on a coeffiecent (lr.decay) $\leq 0$, the decay is not drastic if the lr.decay is choses accordingly, but if the lr.decay is wrongly chosen the method might not converge and slow down a lot and stop long before the zero. The smaller the value of lr.decay the smaller will be the decay, and for lr.decay $=0$ the is no decay. It is similar to the concept of the stickiness, if stikiness coefficient $=0$ then the movement is purely based on the gradient of the function, if it is $>0$ the ball loses it ability to move after a while and sticks to the surface.
+In the Gradient Descendent method, we decide to decay the learning rate (lr) with the number of iterations, based also on a coeffiecent (lr.decay) $\geq 0$, the decay is not drastic if the lr.decay is chosen accordingly, but if the lr.decay is wrongly chosen the method might not converge and slow down a lot until it stops long before the zero. The smaller the value of lr.decay the smaller will be the decay, and for lr.decay $=0$ the is no decay. It is similar to the concept of the stickiness, if stickiness coefficient $=0$ then the movement is purely based on the gradient of the function, if it is $>0$ the ball loses it ability to move after a while and sticks to the surface.
 
-The idea behind it is to slow down the gradient descendent after a while in order to achieve a greater precision in finding the zero and avoiding the situation of the estimated ``bouncing'' back and forth near the minimum (or maximum) of the function. Usually the learning rate or the step must be calculated at each step, as another minimization or maximazation problem, but it can become really expensive computationally, another method is to use the Newton method calculating the inverse of the Hessian matrix and choosing it as the learning rate.
+The idea behind it is to slow down the gradient descendent after a while in order to achieve a greater precision in finding the zero and avoiding the situation of the estimated "bouncing" back and forth near the minimum (or maximum) of the function. Usually the learning rate or the step must be calculated at each step, as another minimization or maximazation problem (in the steepest gradient descendent method), but it can become really expensive computationally, another method is to use the Newton method calculating the inverse of the Hessian matrix and choosing it as the learning rate.
 
-Another change is that we added a stopping criterion, in our case we decided to stop when the squared norm of the gradient vector $||\nabla||^2$ is smaller than a certain tollerance (which is by default $10^{-6}$) the method will stop, this choice was made to make the code a little bit more efficient since it was useless to continue any funther because the iteration sted is defined as the previous value - lr*gradient, so if the gradient is too low the movement will be minimal and a gradient near to $0$ indicated that a stationary point has been found.
+Another change is that we added a stopping criterion, in our case we decided to stop when the squared norm of the gradient vector $||\nabla||^2$ is smaller than a certain tollerance (which is by default $10^{-6}$), this choice was made to make the code a little bit more efficient since it was useless to continue any funther because the iteration step is defined as the previous value - lr*gradient, so if the gradient is too low the movement will be minimal and a gradient near to $0$ indicated that a stationary point has been found.
 
-The function returns a list consisting of all the points created with the iteration, a vector containg the change in value of the objective function (the distance), the optimal point and the value of the objective function in the optimal point and finally a boolean value indicating if the method conveges or not (it is done by checking if the square of the norm of the gradient was smaller than the given tollerance).
+The function returns a list consisting of all the points created with the iteration, a vector containg the change in value of the objective function (the distance), the optimal point and the value of the objective function in the optimal point, a boolean value indicating if the method conveges or not (it is done by checking if the square of the norm of the gradient was smaller than the given tollerance), the determinant of the Hessian matrix in the optimal point and finally number of iterations taken, it return also the value of the final learing rate to check if the lr.decay was choses correctly and lr didn't drop too much.
 
 ```{r gradient descendent, fig.align='center'}
 distance <- function(data,f){
@@ -124,8 +143,24 @@ gradient <- function(data,f){
 #fix the customer_location parameter in the gradient function
 fn.gr <- curry(gradient,customer_locations)
 
+Hessian <- function(data,f){
+  dxx <- sum(((2*((f[1]-data[,1])^2+1))-4*(f[1]-data[,1])^2)/
+    ((f[1]-data[,1])^2+1)^2)
+  dxy <- 0
+  dyx <- 0
+  dyy <- sum(((2*((f[2]-data[,2])^2+1))-4*(f[2]-data[,2])^2)/
+    ((f[2]-data[,2])^2+1)^2)
+  H <- matrix(c(dxx,dyx,dxy,dyy),nrow=2)
+  # Should create a matrix like
+  #          |dxx   dxy|
+  #          |dyx   dyy|
+  return(H)
+}
+fn.H <- curry(Hessian,customer_locations)
+
 # gradient descent function
-gradientDescent <- function(f.init, fn.gr, lr, max_iters=1000,
+gradientDescent <- function(f.init, fn.gr=fn.gr, fn.H=fn.H, 
+                            lr = 0.1, max_iters=1000,
                             lr.decay = 0, toll=1e-6){
   f       <- matrix(NA, nrow = max_iters+1, ncol = 2)
   grad    <- matrix(NA, nrow = max_iters+1, ncol = 2)
@@ -145,7 +180,7 @@ gradientDescent <- function(f.init, fn.gr, lr, max_iters=1000,
   }
   f = f[!is.na(rowSums(f)),]
   distance <- apply(f,1,fn.distance)
-  if (sum(grad[k+1,]^2) < toll)
+  if (sum(grad[k+1,]^2) < toll & det(fn.H(tail(f,1)))>0)
     convergence = TRUE
   else
     convergence = FALSE
@@ -153,29 +188,31 @@ gradientDescent <- function(f.init, fn.gr, lr, max_iters=1000,
               dist        = distance,
               opt_point   = tail(f,1),
               min_dist    = tail(distance,1),
+              det_H       = det(fn.H(tail(f,1))),
               convergence = convergence,
               lr          = lr,# only for testing and development
               iters       = iter)) 
 }
 
-# A function to print the solution the same function will be used also for the 
-# stochastic gradient method since the output list will have the same format
+# A function to print the solution
 print.solution <- function(result){
   P      <- result$opt_point
   P_dist <- result$min_dist
   f      <- result$f
   f_dist <- result$dist
   if (result$convergence)
-    converge <- "The method converges to the minimum."
+    converge <- "The method converges to the minimum"
   else
-    converge <- "The method doesn't converge to the minimum."
+    converge <- "The method doesn't converge to the minimum"
  
-   cat(paste0(" ",converge, " "),'\n',
+   cat(paste0(" ",converge," in ", result$iters,
+       " iterations."),'\n',
        paste0("The minimum is the point of coordinates (",
        round(P[1],2), ",",round(P[2],2),
-       ")"),'\n',paste0("and the value of the function is ",
-       round(P_dist,2), " in ", result$iters,
-       " iterations."))
+       ")"),'\n',paste0("The value of the function is ",
+       round(P_dist,2)),"\n",paste0("The determinant of",
+                                   " the Hessian is ",
+                                   result$det_H))
    
   ggplot(data=data.frame(distance=f_dist)) + 
     aes(x=distance) + 
@@ -186,19 +223,19 @@ print.solution <- function(result){
 }
 ```
 
-Here is a first attempt to find a solution using the gradiente descendent method.
+Here is a first attempt to find a solution using the gradiente descendent method using some random points.
 
 ```{r first attemt,fig.align='center'}
 res <- gradientDescent(c(runif(1,0,1000),runif(1,0,1000)),
-                       fn.gr=fn.gr, lr = 0.1, 
+                       fn.gr=fn.gr, fn.H=fn.H, lr = 0.1, 
                        max_iters = 1000, lr.decay = 0.001)
 
 print.solution(res)
 ```
 
-We notice that the solution is heavily influenced by the initial point (we noticed it on different run of the latter code), to verify if we have a local minimum problem we try to do a 3D plot and a contour plot of the distance function, we expect it to have a lot of minimum function since the function distance from single point has only 1 minimum which is the point itself it has distance 0 from it self and distance for defintion is positive, but as we sum all these distances and it creates a lot of minimum between the point.
+We notice that the solution is heavily influenced by the initial point (we noticed it on different run of the latter code), to verify if we have a local minima problem we try to do a 3D plot and a contour plot of the distance function, we can expect it to have a lot of minimum function since the function distance from single point has only 1 minimum which is the point itself (it has distance 0 from itself and distance for defintion is positive), but as we sum all these distances from all points and it might create a lot of minimum between the point.
 
-It is more intuitive to think a point a heavy mass which deformors the plane and the deformation is based on the distance itself, in the case of a euclidean distance the deformation is a paraboloid, in this case we have a logarithmic tranformation of the euclidean distance traslated by $+1$, thus changing the concavity of the distance function. Now as we put more points on the plane we have that the deformation of this plane creates a lot of local minimum and also a lot of maximum.
+It is more intuitive to think a point as a heavy mass which deforms the plane and the deformation is based on the distance itself, in the case of a euclidean distance the deformation is a paraboloid, in this case we have a logarithmic tranformation of the euclidean distance traslated by $+1$, thus changing the concavity of the distance function. Now as we put more points on the plane we have that the deformation of this plane creates a lot of local minimum and also a lot of maximum.
 
 ```{r the logarithim transformation, fig.align='center'}
 quadratic <- function(x) x^2
@@ -207,20 +244,20 @@ ggplot(data = data.frame(x=0), mapping = aes(x=x)) +
   stat_function(fun = quadratic) + xlim(-5,5) +
   labs(title = "Section of Euclidean distance") + 
   theme(axis.ticks = element_blank(),
-            axis.text  = element_blank(),
-            panel.grid = element_blank(),
-            axis.title = element_blank(),
-            plot.title = element_text(hjust = 0.5))
+        axis.text  = element_blank(),
+        panel.grid = element_blank(),
+        axis.title = element_blank(),
+        plot.title = element_text(hjust = 0.5))
 
 logarithmic <- function(x) log(x^2+1)
 ggplot(data = data.frame(x=0), mapping = aes(x=x)) +
   stat_function(fun = logarithmic) + xlim(-5,5) +
   labs(title = "Section of log transformation of Euclidean dist.") + 
   theme(axis.ticks = element_blank(),
-            axis.text  = element_blank(),
-            panel.grid = element_blank(),
-            axis.title = element_blank(),
-            plot.title = element_text(hjust = 0.5))
+        axis.text  = element_blank(),
+        panel.grid = element_blank(),
+        axis.title = element_blank(),
+        plot.title = element_text(hjust = 0.5))
 ```
 
 
@@ -247,7 +284,7 @@ persp(x, y, z, phi = 30, theta = 60,col = "orange",xlab = "x",
 contour(x,y,z, xlab="y",ylab="y")
 ```
 
-A great method to solve this problem, in this less complex case, is to initiate a lot of random points from which we start the solution, one would be tempted to use a uniform distribuition of the point.
+A great method to solve this problem, in this case, is to initiate a lot of random points from which we start the solution (a multistart method), we start by using a uniform distribuition of the point.
 
 ```{r Multistart to find the optimal solution, fig.align='center'}
 set.seed(123456789)
@@ -256,7 +293,7 @@ y <- runif(1000,0,1000)
 random.points <- cbind(x,y)
 
 ris_temp <- lapply(1:length(y), function(x) {
-  gradientDescent(random.points[x,],fn.gr,lr = 0.1,
+  gradientDescent(random.points[x,],fn.gr,fn.H,lr = 0.1,
                   max_iters = 1000,lr.decay = 0.0001)})
 
 opt_points <- matrix(NA,ncol=2, nrow=length(x))
@@ -283,7 +320,7 @@ y <- rnorm(500,mean.y,sd.y)
 random.points <- cbind(x,y)
 
 ris_temp <- lapply(1:length(y), function(x) {
-  gradientDescent(random.points[x,],fn.gr,lr = 0.1,
+  gradientDescent(random.points[x,],fn.gr,fn.H,lr = 0.1,
                   max_iters = 1000,lr.decay = 0.0001)})
 
 opt_points <- matrix(NA,ncol=2, nrow=length(x))
@@ -297,7 +334,7 @@ for (i in 1:nrow(random.points)){
 print.solution(ris_temp[[which.min(distances)]])
 ```
 
-```{r animate gradiene, fig.align='center'}
+```{r animate gradient, fig.align='center'}
 P     <- ris_temp[[which.min(distances)]]$f
 final <- ris_temp[[which.min(distances)]]$opt_point
 z     <- seq(1,nrow(P),2)
@@ -323,11 +360,11 @@ The best solution found is (310.16,430.87) with a value of 2004.96.
 
 ### 4. Solve the problem with a package provided by R (for instance, using the function `optimr` within the package `optimx`). Note that it is not required to use the `gradient descent` algorithm to solve the problem, other algorithms can be used as well.
 
-In this case there is nothing to comment, we just use the function provided by optimr on the random points generated randomly using a normal distribution.
+In this case there is nothing to comment, we just use the function provided by optimr on the random points generated randomly using a normal distribution. We use as the method `Rcgmin` which is an updated version of the `Conjugate Gradient(CG)` 
 
 ```{r optimr solution}
 ris_temp <- lapply(1:length(y), function(x) {
-  optimr(random.points[x,],fn.distance, fn.gr,method = "CG")})
+  optimr(random.points[x,],fn.distance, fn.gr,method = "Rcgmin")})
 
 opt_points <- matrix(NA,ncol=2, nrow=length(x))
 distances  <- rep(NA,length(x))
@@ -343,7 +380,7 @@ proptimr(ris_temp[[which.min(distances)]])
 
 ### 5. Implement the `Stochastic gradient descent` algorithm with mini-batches and use it to solve the problem. 
 
-In the stochastic method, since our data has the same scale there is no need to normalize. For the stopping creterion we choose to stop if the $||\nabla||^2<$toll or if the improvement of the approximation is very low. The subset of the points is chosen as the $20\%$ of the initial data randomly sampled with replacement. Also in this case we adapt the decaying learning rate.   
+In the stochastic method, since our data has the same scale there is no need to normalize. For the stopping creterion we choose to stop if the $||\nabla||^2<$toll. The subset of the points is chosen as the $20\%$ of the initial data randomly sampled with replacement. Also in this case we adapt the decaying learning rate.   
 
 ```{r Stochastic gradient}
 stoch_gradDescent <- function(xy,f.init, fun.gr, lr, 
@@ -370,6 +407,8 @@ stoch_gradDescent <- function(xy,f.init, fun.gr, lr,
     P[i+1,]  <- f
     iter      <- i
     dist[i+1] <- fn.distance(P[i+1,])
+    if(sum((fun.gr(xy,f))^2)<1e-6)
+      break
  } # end for loop
  P     <- P[!rowSums(is.na(P)),] 
  dist  <- dist[!is.na(dist)]
@@ -409,10 +448,11 @@ f      <- ris_temp[[which.min(distances)]]$opt_point
 f_dist <- ris_temp[[which.min(distances)]]$min_dist
 P_dist <- ris_temp[[which.min(distances)]]$dist
 
-cat(paste0("The minimum is the point of coordinates (",
+cat(paste0(" The minimum is the point of coordinates (",
    round(f[1],2), ",",round(f[2],2),
    ")"),'\n',paste0("and the value of the function is ",
-   round(f_dist,2)))
+   round(f_dist,2)),'\n',"The gradient value in the",
+    " optimal point is (",fn.gr(f),")")
    
 ggplot(data=data.frame(distance=P_dist)) + 
   aes(x=distance) + 
@@ -444,4 +484,92 @@ ggif_minimal <- data.frame(x=P[z,1],y=P[z,2],z=z)%>%
   exit_fade()
 
 animate(ggif_minimal, fps=90)
+```
+
+### Extra: Implementation of the `Newton Method`
+
+Since the inverse of the Hessian Matrix is so easy to calculate, we can try to implement the newton method (usually it is way more faster than the gradient descendent with fixed learning rate), but we must note that the Newton method searches only for the solution of $\nabla=0$, and is not obligated to move towards the minimum, unlike the the gradient descendent method which can be used either to move upward or downward in the function. 
+
+So we might see that the optimal results starts rising instead of going down, and stablizes at a point, whose objective value is higher even than the starting point. 
+This happens because the gradient vector points towards a lower value of the function but if the function is concave it's Hessian is definitive negative, so is it's inverse in our case (since it's diagonal), thus the function starts moving in the opposite direction of the gradient, and if we start far enough from the zero of the gradient the method might even not converge. 
+
+```{r Newton, fig.align='center'}
+inv.fn.H <- function(f){
+  H <- fn.H(f)
+  inv.dxx <- 1/H[1,1]
+  inv.dyy <- 1/H[2,2]
+  inv.H <- matrix(c(inv.dxx,0,0,inv.dyy),nrow=2)
+}
+Newton <- function(f.init, fn.gr=fn.gr, inv.fn.H=inv.fn.H,
+                   max_iters=1000,toll=1e-6){
+  f       <- matrix(NA, nrow = max_iters+1, ncol = 2)
+  f[1,]   <- f.init
+  for(k in 1:max_iters){
+    f[k+1,]   <- f[k,] - inv.fn.H(f[k,])%*%fn.gr(f[k,])
+    #another solution is the Newton solution H.inverse(par[k,])
+    #stop if norm of gradient^2 is smaller than toll practically 0
+    if(sum(fn.gr(f[k,])^2) < toll)  
+      break
+    iter <- k
+  }
+  f = f[!is.na(rowSums(f)),]
+  distance <- apply(f,1,fn.distance)
+  if (sum(fn.gr(f[k+1,])^2) < toll)
+    convergence = TRUE
+  else
+    convergence = FALSE
+  return(list(f           = f,
+              dist        = distance,
+              opt_point   = tail(f,1),
+              min_dist    = tail(distance,1),
+              det_H       = det(fn.H(tail(f,1))),
+              convergence = convergence,
+              iters       = iter)) 
+}
+
+ris_temp <- lapply(1:length(y), function(x) {
+  Newton(random.points[x,],fn.gr,inv.fn.H,
+                  max_iters = 1000)})
+
+opt_points <- matrix(NA,ncol=2, nrow=length(x))
+distances  <- rep(NA,length(x))
+
+for (i in 1:nrow(random.points)){
+  opt_points[i,] <- ris_temp[[i]]$opt_point
+  distances[i]   <- ris_temp[[i]]$min_dist
+}
+
+f      <- ris_temp[[which.min(distances)]]$opt_point
+f_dist <- ris_temp[[which.min(distances)]]$min_dist
+P_dist <- ris_temp[[which.min(distances)]]$dist
+
+cat(paste0("The stationary is the point of coordinates (",
+   round(f[1],2), ",",round(f[2],2),
+   ")"),'\n',paste0("and the value of the function is ",
+   round(f_dist,2)))
+   
+ggplot(data=data.frame(distance=P_dist)) + 
+  aes(x=distance) + 
+  geom_line(aes(x = 1:length(distance),y=distance)) +
+  labs(title = "Convergence plot",
+       x = "Iterations", y="Distance Value") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+Here is an example on how the Newton method can fail, and rapidly move out of our initial domain (where we can find the minimum).
+
+```{r no converge Newton}
+
+no_converge <- Newton(c(0,0),fn.gr,inv.fn.H,
+                       max_iters = 10)
+
+ggplot(data=data.frame(distance=no_converge$dist)) + 
+  aes(x=distance) + 
+  geom_line(aes(x = 1:length(distance),y=distance)) +
+  labs(title = "Non Convergence of Newton",
+       x = "Iterations", y="Distance Value") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+cat("The final point is (",
+    no_converge$opt_point[1],",",no_converge$opt_point[2],")")
 ```
