@@ -2,20 +2,20 @@
 title: "Assignment 3 - The free position facility location problem"
 author: "Pranav Kasela $846965$"
 course: "Decision Models"
-output:
-  pdf_document: 
-    toc: yes
-    header-includes:
+header-includes:
    - \usepackage{animate}
-  html_document:
-    df_print: paged
-    toc: yes
+output:
   prettydoc::html_pretty:
     theme: architect
     highlight: vignette
     toc: yes
     toc_depth: 5
     df_print: paged
+  html_document:
+    df_print: paged
+    toc: yes
+  pdf_document: 
+    toc: yes
 ---
 
 
@@ -92,7 +92,7 @@ We see that the points are randomly distributed among the plane, this indicates 
 We start calculating the gradient of the function $d(\bar{f})=d(\chi,\upsilon)$:
 
 $$
-\nabla = \Big(\sum_i \dfrac{2(\chi-x_i)}{(\chi-x_i)^2 +1},\sum_i \dfrac{2(\upsilon-y_i)}{(\upsilon-y_i)^2 +1}\Big)
+\nabla_d = \Big(\sum_i \dfrac{2(\chi-x_i)}{(\chi-x_i)^2 +1},\sum_i \dfrac{2(\upsilon-y_i)}{(\upsilon-y_i)^2 +1}\Big)^T
 $$
 
 This gradient will be used in the numerical methods to search for a local minimum.
@@ -122,7 +122,7 @@ $$
 
 In the Gradient Descendent method, we decide to decay the learning rate (lr) with the number of iterations, based also on a coeffiecent (lr.decay) $\geq 0$, the decay is not drastic if the lr.decay is chosen accordingly, but if the lr.decay is wrongly chosen the method might not converge and slow down a lot until it stops long before the zero. The smaller the value of lr.decay the smaller will be the decay, and for lr.decay $=0$ the is no decay. It is similar to the concept of the stickiness, if stickiness coefficient $=0$ then the movement is purely based on the gradient of the function, if it is $>0$ the ball loses it ability to move after a while and sticks to the surface.
 
-The idea behind it is to slow down the gradient descendent after a while in order to achieve a greater precision in finding the zero and avoiding the situation of the estimated "bouncing" back and forth near the minimum (or maximum) of the function. Usually the learning rate or the step must be calculated at each step, as another minimization or maximazation problem (in the steepest gradient descendent method), but it can become really expensive computationally, another method is to use the Newton method calculating the inverse of the Hessian matrix and choosing it as the learning rate.
+The idea behind it is to slow down the gradient descendent after a while in order to achieve a greater precision in finding the zero and avoiding the situation of the estimated "bouncing" back and forth near the minimum (or maximum) of the function. Usually the learning rate or the step must be calculated at each step, as another minimization or maximization problem (in the steepest gradient descendent method), but it can become really expensive computationally, another method is to use the Newton method calculating the inverse of the Hessian matrix and choosing it as the learning rate.
 
 Another change is that we added a stopping criterion, in our case we decided to stop when the squared norm of the gradient vector $||\nabla||^2$ is smaller than a certain tollerance (which is by default $10^{-6}$), this choice was made to make the code a little bit more efficient since it was useless to continue any funther because the iteration step is defined as the previous value - lr*gradient, so if the gradient is too low the movement will be minimal and a gradient near to $0$ indicated that a stationary point has been found.
 
@@ -230,6 +230,7 @@ res <- gradientDescent(c(runif(1,0,1000),runif(1,0,1000)),
                        fn.gr=fn.gr, fn.H=fn.H, lr = 0.1, 
                        max_iters = 1000, lr.decay = 0.001)
 
+
 print.solution(res)
 ```
 
@@ -261,7 +262,7 @@ ggplot(data = data.frame(x=0), mapping = aes(x=x)) +
 ```
 
 
-Let's try to see it with a 3D plot helped by a contour plot, in order to avoid complex and black plot each point is distant 5 units from each other and we plot only between: $400<x<600$ and $300<y<500$ to show the problem of a lot a local minima and maxima.
+Let's try to see it with a 3D plot helped by a contour plot, in order to avoid complex and black plot each point is distant 5 units from each other and we plot only between: $400<x<600$ and $300<y<500$ to show the problem of a lot a local minima and maximum.
 
 ```{r 3D plot of function, fig.align='center'}
 helper.dist <- function(x,y){ #m and c are vectors
@@ -486,12 +487,12 @@ ggif_minimal <- data.frame(x=P[z,1],y=P[z,2],z=z)%>%
 animate(ggif_minimal, fps=90)
 ```
 
-### Extra: Implementation of the `Newton Method`
+### Extra: Implementation of the `Newton Method` and `Conjugate Descendent Method`
 
 Since the inverse of the Hessian Matrix is so easy to calculate, we can try to implement the newton method (usually it is way more faster than the gradient descendent with fixed learning rate), but we must note that the Newton method searches only for the solution of $\nabla=0$, and is not obligated to move towards the minimum, unlike the the gradient descendent method which can be used either to move upward or downward in the function. 
 
 So we might see that the optimal results starts rising instead of going down, and stablizes at a point, whose objective value is higher even than the starting point. 
-This happens because the gradient vector points towards a lower value of the function but if the function is concave it's Hessian is definitive negative, so is it's inverse in our case (since it's diagonal), thus the function starts moving in the opposite direction of the gradient, and if we start far enough from the zero of the gradient the method might even not converge. 
+This happens because the negative gradient vector points towards a lower value of the function but if the function is concave it's Hessian is definitive negative, so is it's inverse in our case (since it's diagonal), thus the function starts moving in the opposite direction of the gradient, and if we start far enough from the zero of the gradient the method might even not converge. 
 
 ```{r Newton, fig.align='center'}
 inv.fn.H <- function(f){
@@ -556,7 +557,7 @@ ggplot(data=data.frame(distance=P_dist)) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-Here is an example on how the Newton method can fail, and rapidly move out of our initial domain (where we can find the minimum).
+Here is an example on how the Newton method can fail, and rapidly diverge to points far far away.
 
 ```{r no converge Newton}
 
@@ -573,3 +574,89 @@ ggplot(data=data.frame(distance=no_converge$dist)) +
 cat("The final point is (",
     no_converge$opt_point[1],",",no_converge$opt_point[2],")")
 ```
+
+Here we try to implement the Conjugate Gradient Descendent method, in the first step we basically calculate the second point as $x_1=x_0-\nabla_d(x_0)$, from here on we calculate for each step $\Delta_n=\nabla_d(x_n)=(\delta_\chi,\delta_\upsilon)^T$ and define the step "lr" as $\beta= \max\Big(\frac{t(\Delta_{n+1})\Delta_{n+1}}{t(\Delta_n)\Delta_n},0\Big)$ where $t(\Delta_n)$ is the transpose of the vector $\Delta_n$ and the next point is calculated as $x_{n+1} = x_n - \beta\Delta_n$, if $\beta<0$, so we will move in the opposite direction of the one we desire, the $\beta$ will be reseted to $0$, so the process will start again since we will have $\Delta_n=\Delta_{n+1}$ thus the next $\beta=1$, which was how we started the method. This estimation of $\beta$ was proposed by Fletcher and Reeves, there are other ways of calculating the moving rate, for example another one is: $\beta=\frac{t(\Delta_{n+1}) (\Delta_{n+1}-\Delta_n)}{t(\Delta_n)\Delta_n}$ proposed by Polak and Ribiere. 
+
+```{r conjugate gradient descendent}
+conjugate <- function(f.init, fn.gr=fn.gr, fn.H=fn.H,
+                   max_iters=1000,toll=1e-6){
+  f         <- matrix(NA, nrow = max_iters+1, ncol = 2)
+  f[1,]     <- f.init
+  delta     <- matrix(NA, nrow = max_iters+1, ncol = 2)
+  delta[1,] <- fn.gr(f[1,])
+  #first step moves in the direction of minima
+  f[2,]     <- f[1,] - delta[1,] 
+  delta[2,] <- fn.gr(f[2,])
+  beta <- max(as.numeric((delta[2,]%*%delta[2,])/
+                       (delta[1,]%*%delta[1,])),0)
+  for(k in 2:max_iters){
+    f[k+1,]     <- f[k,] - beta*delta[k,]
+    delta[k+1,] <- fn.gr(f[k+1,])
+    #beta <- max(as.numeric((delta[k+1,]%*%delta[k+1,])/
+    #                     (delta[k,]%*%delta[k,])),0)
+    
+    beta <- max(as.numeric((delta[k+1,]%*%delta[k+1,])/
+                         (delta[k,]%*%delta[k,])),0)
+    #stop if norm of gradient^2 is smaller than toll practically 0
+    if(sum(fn.gr(f[k,])^2) < toll)  
+      break
+    iter <- k
+  }
+  f = f[!is.na(rowSums(f)),]
+  distance <- apply(f,1,fn.distance)
+  if ((sum(fn.gr(f[k+1,])^2) < toll) && (fn.H(f[k+1,])>0))
+    convergence = TRUE
+  else
+    convergence = FALSE
+  return(list(f           = f,
+              dist        = distance,
+              opt_point   = tail(f,1),
+              min_dist    = tail(distance,1),
+              det_H       = det(fn.H(tail(f,1))),
+              convergence = convergence,
+              iters       = iter)) 
+}
+```
+
+This algorithm seems to take less iteration and less time than the other procedures (except for the Newton method, which unfortunately does not guarantee the convergerce towards the minima). We generate random points between 300 and 600 because now we know that the global minima or atleast one the best points for minima is in this area. 
+
+We can see that is sometimes the value of the function increases in this method this is due to due to the fact that the method is based on the ratio between the gradient on the current point and the precedent one, so if the precedent point had a gradient lower than 1 we will see an increase in the value of $\beta$, which, if increases a lot, can create a strong launch of the point the direction of movement (some times even skipping the local minima).
+
+```{r Implementation of the method,fig.align='center'}
+set.seed(123456789)
+x <- runif(300,300,600)
+y <- runif(300,300,600)
+random.points <- cbind(x,y)
+
+ris_temp <- lapply(1:nrow(random.points), function(x) {
+          conjugate(random.points[x,],
+                    fn.gr,fn.H,max_iters = 1000)})
+
+opt_points <- matrix(NA,ncol=2, nrow=length(x))
+distances  <- rep(NA,length(x))
+
+for (i in 1:nrow(random.points)){
+  opt_points[i,] <- ris_temp[[i]]$opt_point
+  distances[i]   <- ris_temp[[i]]$min_dist
+}
+
+f      <- ris_temp[[which.min(distances)]]$opt_point
+f_dist <- ris_temp[[which.min(distances)]]$min_dist
+P_dist <- ris_temp[[which.min(distances)]]$dist
+
+ggplot(data=data.frame(distance=P_dist)) + 
+  aes(x=distance) + 
+  geom_line(aes(x = 1:length(distance),y=distance)) +
+  labs(title = "Convergence of Conjugate Descendent",
+       x = "Iterations", y="Distance Value") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+cat(" The best point found is (",
+    f[1],",",f[2],") \n with distance value: ", f_dist)
+```
+
+Concluding we can say that the Conjugate Gradient Method seems to be the best one so far, since it was able to calculate a minimum of $2004.964$ at the points $(310.16,430.87)$, way more faster than the others. The stochastic method is more useful in cases where the dataset is bigger than the one given to us, so in this case, where the gradient was not so complicated, this method didn't have any extra usefulness than the classical gradient descendent.
+
+The idea of decreasing the learning rate, helped us into stablizing the solution after a certain number of iterations, of course there are more efficient algorithm to adapt the learning rate in a more intelligent way, for example calculating the "pace of movement" of the point towards the minima, and adjust accordingly.
+
+One great idea could have been to let the initial point explore the area around it, using some heuristics (which will be used the next assignment), instead seeing the "low" complexity of the problem we decided to randomly start a different locations (the multistart method) and keep the best solution it found.
