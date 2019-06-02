@@ -1,6 +1,9 @@
 ---
 title: "Assignment 4"
-output: html_document
+author: "Pranav Kasela $846965$"
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -13,11 +16,13 @@ require(curry)
 require(GA)
 require(ggplot2)
 require(reshape2)
-library(ConsPlan)
+require(dplyr)
+require(Rcpp)
 ```
 
+Initially the function that were being using were the written in R, but one of our colleague Federico Moiraghi, was kind enough to provide his code compiled in Cpp for the time function to speed up the process. Some parameters are modified in the function before reusing his code.
 
-```{r Time function}
+```{r Slow Time function}
 time <- function(perm,distMatrix){
   n_jobs     <- ncol(distMatrix)
   n_machines <- nrow(distMatrix)
@@ -37,30 +42,97 @@ time <- function(perm,distMatrix){
 fitness <- function(perm,distMatrix){
   return(1/time(perm,distMatrix))
 }
+```
 
-# Qua si legge time_matrix
-time_matrix <- as.matrix(read.csv("j20-m5",sep=" ",header = F))
+From hereon the time function used will be timeCpp, while the fitness code will be fitnessCpp.
+
+```{r Cpp function}
+cppFunction('double fitnessCpp(NumericVector perm,
+                            NumericMatrix distMatrix)
+    {
+        int nrow = distMatrix.nrow();
+        int ncol = distMatrix.ncol();
+        int norder = perm.size();
+        NumericVector order(norder);
+        for (int i = 0; i < norder; i++) order[i] = perm[i]-1;
+        NumericMatrix time_matrix(nrow, norder);
+        time_matrix[0] = distMatrix[nrow * order[0]];
+        for (int r = 1; r < nrow; r++)
+            time_matrix[r] = time_matrix[r - 1] +
+            distMatrix[nrow * order[0] + r];
+        for (int c = 1; c < norder; c++)
+            time_matrix[nrow * c] = time_matrix[nrow * (c - 1)] +
+            distMatrix[nrow * order[c]];
+        for (int r = 1; r < nrow; r++)
+            for (int c = 1; c < norder; c++)
+                if (time_matrix[nrow * c + (r - 1)] > time_matrix[nrow * (c - 1) + r])
+                    time_matrix[nrow * c + r] = time_matrix[nrow * c + (r - 1)] +
+            distMatrix[nrow * order[c] + r];
+        else
+            time_matrix[nrow * c + r] = time_matrix[nrow * (c - 1) + r] +
+            distMatrix[nrow * order[c] + r];
+        return 1/time_matrix[nrow * norder - 1];
+    }')
+
+cppFunction('double timeCpp(NumericVector perm,
+                            NumericMatrix distMatrix)
+    {
+        int nrow = distMatrix.nrow();
+        int ncol = distMatrix.ncol();
+        int norder = perm.size();
+        NumericVector order(norder);
+        for (int i = 0; i < norder; i++) order[i] = perm[i]-1;
+        NumericMatrix time_matrix(nrow, norder);
+        time_matrix[0] = distMatrix[nrow * order[0]];
+        for (int r = 1; r < nrow; r++)
+            time_matrix[r] = time_matrix[r - 1] +
+            distMatrix[nrow * order[0] + r];
+        for (int c = 1; c < norder; c++)
+            time_matrix[nrow * c] = time_matrix[nrow * (c - 1)] +
+            distMatrix[nrow * order[c]];
+        for (int r = 1; r < nrow; r++)
+            for (int c = 1; c < norder; c++)
+                if (time_matrix[nrow * c + (r - 1)] > time_matrix[nrow * (c - 1) + r])
+                    time_matrix[nrow * c + r] = time_matrix[nrow * c + (r - 1)] +
+            distMatrix[nrow * order[c] + r];
+        else
+            time_matrix[nrow * c + r] = time_matrix[nrow * (c - 1) + r] +
+            distMatrix[nrow * order[c] + r];
+        return time_matrix[nrow * norder - 1];
+    }')
+```
+
+Here the testing of the functions are done with the smallest table. The algorithm used are the Genetic Algorithm and the Simulated Annealing to check their performance.
+
+```{r ga with 20-5}
+time_matrix <- as.matrix(read.csv("j20-m5",sep=" ",header = FALSE))
 n_jobs <- ncol(time_matrix)
 
 
-GA.fit <- ga(type = "permutation",
-  fitness = fitness,
-  distMatrix = time_matrix,
-  lower = 1,
-  upper = n_jobs,
-  popSize = 1000, #ci mette molto tempo ma arriva alla soluzione ottimale
-  maxiter = 10000,
-  run = 300,
-  pmutation = 0.2,
-  keepBest = TRUE,
-  monitor = NULL)
+time_taken <- microbenchmark::microbenchmark(
+  GA.fit <- ga(type = "permutation",
+    fitness = fitnessCpp,
+    distMatrix = time_matrix,
+    lower = 1,
+    upper = n_jobs,
+    popSize = 600, 
+    maxiter = 10000,
+    run = 200,
+    pmutation = 0.2,
+    keepBest = TRUE,
+    monitor = NULL,
+    seed = 1234),
+times = 1
+)
 
 summary(GA.fit)
 
-time(GA.fit@solution[1,],distMatrix=time_matrix)
-
+timeCpp(GA.fit@solution[1,],time_matrix) #best time
+```
+```{r no output plot, fig.show='hide'}
 out <- plot(GA.fit, main = "GA progression")
-
+```
+```{r plot}
 melt(out[,c(1:3,5)],id.var="iter") %>% 
   mutate(time=1/value) -> df1
 
@@ -74,62 +146,75 @@ ggplot(df1, aes(x = iter, y = time,
   labs(title = "GA Progression")
 ```
 
-```{r 50-10}
-time_matrix <- as.matrix(read.csv("j50-m10",sep=" ",header=F))
-n_jobs <- ncol(time_matrix)
 
-
-GA.fit <- ga(type = "permutation",
-  fitness = fitness,
-  distMatrix = time_matrix,
-  lower = 1,
-  upper = n_jobs,
-  popSize = 500,
-  maxiter = 10000,
-  run = 200,
-  pmutation = 0.2,
-  keepBest = TRUE,
-  monitor = NULL)
-
-summary(GA.fit)
-
-time(GA.fit@solution[1,],distMatrix=time_matrix)
-
-out <- plot(GA.fit, main = "GA progression")
-
-melt(out[,c(1:3,5)],id.var="iter") %>% 
-  mutate(time=1/value) -> df1
-
-ggplot(df1, aes(x = iter, y = time, 
-               group = variable, colour = variable)) +
-  xlab("Generation") + ylab("Time values") +
-  #geom_point(aes(shape = variable)) +
-  geom_line(aes(lty = variable)) +
-  scale_colour_brewer(palette = "Set1") +
-  theme_bw() +
-  labs(title = "GA Progression")
-```
-
-```{r}
-funObj <- tail_curry(time,time_matrix)
-
+```{r SA}
 swapJobs <- function(perm){
+    perm <- as.numeric(perm)
     n <- length(perm)
-    pair <- sample.int(n,2) # si sceglie una copia
-    nmin <- min(pair)         
-    nmax <- max(pair)
-    newperm <- perm
-    newperm[nmin] <- perm[nmax]
-    newperm[nmax] <- perm[nmin]
+    n_change <- min(sample(1:floor(n/2),1),5) #no more than 5 changes at a time
+    change <- sort(sample.int(n,n_change))
+    newperm <- replace(perm,change,perm[sort(change,decreasing = TRUE)])
     return(as.numeric(newperm))
 }
 
-start <- as.numeric(sample(1:n_jobs,n_jobs))
-start
+SA <- function(tour, distMatrix, maxIterNoChange=2000, T_ini = 50, T_min = 1){
+  path <- tour
+  n <- length(path)
+  tmin <- T_min    # minimum temperature
+  alpha <- 0.999  # update factor
+  T <- T_ini
+  tini <- T_ini   # starting temperature
+  dist <- timeCpp(path, distMatrix)
+  bestLength <- dist
+  traceBest <- c(dist) 
+  traceCurrentLength <- c(dist)
+  iterNoChange = 0
+  while(T >= tmin){        # if the temperature is not at its minimum
+    iterNoChange = iterNoChange+1
+    newpath <- swapJobs(path) #swap
+    dist_new <- timeCpp(newpath, distMatrix)
+    if(dist_new <= bestLength){
+      path <- newpath
+      dist <- dist_new
+      bestLength <- dist
+      iterNoChange <- 0
+    }
+    else {
+      
+      if (exp((dist-dist_new)/T)>runif(1, 0, 1)){
+        dist <- dist_new
+        path <- newpath
+        iterNoChange <- 0
+      }
+      
+    }
+    traceBest <- append(traceBest, bestLength)
+    traceCurrentLength <- append(traceCurrentLength, dist)
+    T <- T*alpha # the temperature is updated
+    if(iterNoChange >= maxIterNoChange){ break}
+  }
+  res = list(route=path, traceBest = traceBest, trace = traceCurrentLength)
+  class(res) = "SAObj"
+  print(paste("best=", toString(bestLength), sep=" "))
+  return(res)  
+}
 
-sa_opt =  sann(start.seq = start, fn = funObj,
-               gr = swapJobs, maxit = 100000, 
-               REPORT = 1000, tmax = 100, temp = 9000)
-
+start <- as.numeric(sample(1:n_jobs,n_jobs)) #start randomly
+res <- SA(start, time_matrix, maxIterNoChange = 10000)
 ```
 
+When trying with the 100x20 table, the **GA** algorithm finished in approximately 15 minutes, while **SA** algorithm finished in a few seconds giving more or less the same result so the best choice was to procceed using only the **SA** algorithm.  The result for the 100x20 table is not provided here in order to avoid waiting 15 minutes more every compilation of the results.
+
+## Final Results using 500 jobs with 20 machines.
+
+```{r final with 500x20}
+time_matrix <- as.matrix(read.csv("j500-m20",sep=" ",header = FALSE))
+n_jobs <- ncol(time_matrix)
+
+funObj <- tail_curry(timeCpp,time_matrix)
+
+
+start <- as.numeric(sample(1:n_jobs,n_jobs))
+
+res <- SA(start,time_matrix,maxIterNoChange = 10000)
+```
