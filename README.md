@@ -1,21 +1,21 @@
 # Decision-Models
 
-Reports of the assignments: Decision Models
+Reports of the assignments: **Decision Models**
 
-#### Arguments:
+**Arguments:**
 - Assignment 1: Decision Trees
 - Assignment 2: Linear Programming
 - Assignment 3: Non linear optimization
 - Assignment 4: Heuristics
 - Assignment 5: ??
 
-Full Name: Pranav Kasela
+Full Name: Pranav **Kasela**
 
 Roll number: 846965
 
 Academic year: 2018/2019
 
-Course: DATA SCIENCE 
+Course: **DATA SCIENCE** 
 
 Faculty: DEPARTMENT OF INFORMATICS, SYSTEMS AND COMMUNICATION (DISCO) 
 
