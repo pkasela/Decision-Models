@@ -2,8 +2,17 @@
 title: "Assignment 4"
 author: "Pranav Kasela $846965$"
 output:
-  html_document: default
-  pdf_document: default
+  pdf_document: 
+    toc: yes
+  html_document:
+    toc: yes
+    df_print: paged
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: vignette
+    toc: yes
+    toc_depth: 5
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -11,8 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(fig.align = 'center')
 ```
 
-```{r packages, message=F}
-require(curry)
+```{r packages, message=FALSE}
 require(GA)
 require(ggplot2)
 require(reshape2)
@@ -20,12 +28,15 @@ require(dplyr)
 require(Rcpp)
 ```
 
-## Function definition
+# Function definition
 
-Initially the function that were being using were the written in R, but one of our colleague Federico Moiraghi, was kind enough to provide his code compiled in Cpp for the time function to speed up the process. Some parameters are modified in the function before reusing his code.
+Initially the functions that were being using to calculate the makespan and fitness were the written in R, but one of the colleagues: *Federico Moiraghi*, was kind enough to provide his code compiled in C++ for the time function to speed up the process. Some parameters are modified in the function before reusing his code.
+
+Since the time is $>0$, the inverse of the makespan can be used as the fitness function for **GA** algorithm, since maximizing the fitness is equivalent to minimizing the makespan.
 
 ```{r Slow Time function}
-time <- function(perm,distMatrix){
+#-- Function before C++
+makespan <- function(perm,distMatrix){
   n_jobs     <- ncol(distMatrix)
   n_machines <- nrow(distMatrix)
   dist       <- matrix(NA, nrow=n_machines, ncol=n_jobs)
@@ -42,13 +53,14 @@ time <- function(perm,distMatrix){
 }
 
 fitness <- function(perm,distMatrix){
-  return(1/time(perm,distMatrix))
+  return(1/makespan(perm,distMatrix))
 }
 ```
 
-From hereon the time function used will be timeCpp, while the fitness code will be fitnessCpp.
+From hereon the time function used will be makespanCpp, while the fitness code will be fitnessCpp.
 
 ```{r Cpp function}
+#-- function in C++ 
 cppFunction('double fitnessCpp(NumericVector perm,
                             NumericMatrix distMatrix)
     {
@@ -76,7 +88,7 @@ cppFunction('double fitnessCpp(NumericVector perm,
         return 1/time_matrix[nrow * norder - 1];
     }')
 
-cppFunction('double timeCpp(NumericVector perm,
+cppFunction('double makespanCpp(NumericVector perm,
                             NumericMatrix distMatrix)
     {
         int nrow = distMatrix.nrow();
@@ -104,21 +116,22 @@ cppFunction('double timeCpp(NumericVector perm,
     }')
 ```
 
-## Table with 20 jobs for 5 machines for the performance checking
+# Table with 20 jobs for 5 machines for the performance checking
 
-Here the testing of the functions are done with the smallest table. The algorithm used are the Genetic Algorithm and the Simulated Annealing to check their performance.
-### GA algorithm
+The testing of the functions are done with the smallest table available on the website. The algorithm used are the Genetic Algorithm from the R package and the Simulated Annealing that will be implemented manually to check their performance.
+
+## GA algorithm (from the GA package)
 
 ```{r ga with 20-5}
-#This is the pretest given in the assignment
+#This is the pre-test given in the assignment
 time_matrix <- matrix(c(29,30,27,2,37,62,21,6,95,59,70,82,
-                 85,11,62,80,65,55,67,57),nrow = 4)
+                 85,11,62,80,65,55,67,57),nrow = 4) #used once to test and never again
 
 time_matrix <- as.matrix(read.csv("j20-m5",sep=" ",header = FALSE))
 n_jobs <- ncol(time_matrix)
 
 
-time_taken <- microbenchmark::microbenchmark(
+time_taken_GA_20_5 <- microbenchmark::microbenchmark(
   GA.fit <- ga(type = "permutation",
     fitness = fitnessCpp,
     distMatrix = time_matrix,
@@ -126,7 +139,7 @@ time_taken <- microbenchmark::microbenchmark(
     upper = n_jobs,
     popSize = 600, 
     maxiter = 10000,
-    run = 200,
+    run = 300,
     pmutation = 0.2,
     keepBest = TRUE,
     monitor = NULL,
@@ -136,32 +149,41 @@ times = 1
 
 summary(GA.fit)
 
-timeCpp(GA.fit@solution[1,],time_matrix) #best time
+makespanCpp(GA.fit@solution[1,],time_matrix) #best time
 ```
 ```{r no output plot, fig.show='hide'}
 out <- plot(GA.fit, main = "GA progression")
 ```
 ```{r plot}
 melt(out[,c(1:3,5)],id.var="iter") %>% 
-  mutate(time=1/value) -> df1
+  mutate(inv.value=1/value) -> df1
 
-ggplot(df1, aes(x = iter, y = time, 
+ggplot(df1, aes(x = iter, y = inv.value,
                group = variable, colour = variable)) +
-  xlab("Generation") + ylab("Time values") +
-  #geom_point(aes(shape = variable)) +
+  xlab("Generation") + ylab("Makespan") +
   geom_line(aes(lty = variable)) +
   scale_colour_brewer(palette = "Set1") +
-  theme_bw() +
-  labs(title = "GA Progression")
+  labs(title = "GA Progression with 20 jobs in 5 machines")
 ```
 
-### SA algorithm
+The **GA** algoritm finds the best solution as 1297, with an initial population of 600, a mutation probability of 20\% and a crossover probability of 80\%. An initial trend of improvement can be seen 
+
+## SA algorithm (manually implemented)
+
+The change that has been made the SA algorithm is the swapJobs function, in this case since the permutation will be done on a lot of elements (=number of jobs)
+- If the number of the jobs is greater than 10, the swap will be done on a random number of elements between 2 and 5;
+- If the number of jobs is smaller or equal to 10, the swap will be done on 2 elements.
+
+The algorithm, since it's computationally easy to compute, will be done 5 time, to avoid heavy dependencies from it's probabistic nature.
 
 ```{r SA}
 swapJobs <- function(perm){
     perm <- as.numeric(perm)
     n <- length(perm)
-    n_change <- min(sample(1:floor(n/2),1),5) #no more than 5 changes at a time
+    if(n>10)
+      n_change <- min(sample(2:ceiling(n/5),1),5) #no more than 5 changes at a time
+    else 
+      n_change <- 2
     change <- sort(sample.int(n,n_change))
     newperm <- replace(perm,change,perm[sort(change,decreasing = TRUE)])
     return(as.numeric(newperm))
@@ -174,7 +196,7 @@ SA <- function(tour, distMatrix, maxIterNoChange = 2000, T_ini = 50, T_min = 1){
   alpha <- 0.999  # update factor
   T <- T_ini
   tini <- T_ini   # starting temperature
-  dist <- timeCpp(path, distMatrix)
+  dist <- makespanCpp(path, distMatrix)
   bestLength <- dist
   traceBest <- c(dist) 
   traceCurrentLength <- c(dist)
@@ -182,7 +204,7 @@ SA <- function(tour, distMatrix, maxIterNoChange = 2000, T_ini = 50, T_min = 1){
   while(T >= tmin){        # if the temperature is not at its minimum
     iterNoChange = iterNoChange+1
     newpath <- swapJobs(path) #swap
-    dist_new <- timeCpp(newpath, distMatrix)
+    dist_new <- makespanCpp(newpath, distMatrix)
     if(dist_new <= bestLength){
       path <- newpath
       dist <- dist_new
@@ -204,91 +226,115 @@ SA <- function(tour, distMatrix, maxIterNoChange = 2000, T_ini = 50, T_min = 1){
     if(iterNoChange >= maxIterNoChange){ break}
   }
   res = list(route=path, traceBest = traceBest, trace = traceCurrentLength)
-  class(res) = "SAObj"
-  print(paste("best=", toString(bestLength), sep=" "))
   return(res)  
 }
 
+
 start <- as.numeric(sample(1:n_jobs,n_jobs)) #start randomly
-res <- SA(start, time_matrix, maxIterNoChange = 10000)
+best_res   <- SA(start, time_matrix, maxIterNoChange = 10000)
+
+for (i in 1:4){
+  start <- as.numeric(sample(1:n_jobs,n_jobs)) #start randomly
+  res   <- SA(start, time_matrix, maxIterNoChange = 10000)
+  if (tail(res$traceBest,1) < tail(best_res$traceBest,1))
+    best_res <- res
+}
+tail(best_res$traceBest,1) #best value found
 ```
 
-When trying with the 100x20 table, the **GA** algorithm finished in approximately 15 minutes, while **SA** algorithm finished in a few seconds giving more or less the same result so the best choice was to procceed using only the **SA** algorithm.  The result for the 100x20 table is not provided here in order to avoid waiting 15 minutes more every compilation of the results.
+When trying with the 100x20 table, the **GA** algorithm finished in approximately 5 minutes, while **SA** algorithm finished in a few seconds giving more or less the same result (GA best makespan was 6557 while SA best makespan was 6594). The result for the 100x20 table is not provided here for the simplicity of the report.
 
-## Final Results using 500 jobs with 20 machines.
+# Final Results using 500 jobs with 20 machines.
 
-```{r final with 500x20}
+```{r GA per 500x20}
 time_matrix <- as.matrix(read.csv("j500-m20",sep=" ",header = FALSE))
 n_jobs <- ncol(time_matrix)
 
-funObj <- tail_curry(timeCpp,time_matrix)
+time_taken_GA_500_20 <- microbenchmark::microbenchmark(
+  GA.fit <- ga(type = "permutation",
+    fitness = fitnessCpp,
+    distMatrix = time_matrix,
+    lower = 1,
+    upper = n_jobs,
+    popSize = 300, 
+    maxiter = 10000,
+    run = 100,
+    pmutation = 0.2,
+    keepBest = TRUE,
+    monitor = NULL,
+    seed = 1234),
+times = 1
+)
 
+makespanCpp(GA.fit@solution[1,],time_matrix) #best time
+```
+```{r no output plot 500x20, fig.show='hide'}
+out <- plot(GA.fit, main = "GA progression")
+```
+```{r GA.fit plot 500x20}
+melt(out[,c(1:3,5)],id.var="iter") %>% 
+  mutate(inv.value=1/value) -> df1
 
-start <- as.numeric(sample(1:n_jobs,n_jobs))
-
-res <- SA(start,time_matrix,maxIterNoChange = 100,T_ini = 10000,T_min = 1)
-
-ggplot(data = data.frame(iteration=1:length(res$traceBest),
-                         optimal=res$traceBest), aes(iteration,optimal)) + 
-  geom_line()
+ggplot(df1, aes(x = iter, y = inv.value,
+               group = variable, colour = variable)) +
+  xlab("Generation") + ylab("Makespan") +
+  geom_line(aes(lty = variable)) +
+  scale_colour_brewer(palette = "Set1") +
+  labs(title = "GA Progression with 500 jobs in 20 machines")
 ```
 
-```{r}
-cppFunction('double timeCppMatrix(NumericVector perm,
-                            NumericMatrix distMatrix)
-    {
-        int nrow = distMatrix.nrow();
-        int ncol = distMatrix.ncol();
-        int norder = perm.size();
-        NumericVector order(norder);
-        for (int i = 0; i < norder; i++) order[i] = perm[i]-1;
-        NumericMatrix time_matrix(nrow, norder);
-        time_matrix[0] = distMatrix[nrow * order[0]];
-        for (int r = 1; r < nrow; r++)
-            time_matrix[r] = time_matrix[r - 1] +
-            distMatrix[nrow * order[0] + r];
-        for (int c = 1; c < norder; c++)
-            time_matrix[nrow * c] = time_matrix[nrow * (c - 1)] +
-            distMatrix[nrow * order[c]];
-        for (int r = 1; r < nrow; r++)
-            for (int c = 1; c < norder; c++)
-                if (time_matrix[nrow * c + (r - 1)] > time_matrix[nrow * (c - 1) + r])
-                    time_matrix[nrow * c + r] = time_matrix[nrow * c + (r - 1)] +
-            distMatrix[nrow * order[c] + r];
-        else
-            time_matrix[nrow * c + r] = time_matrix[nrow * (c - 1) + r] +
-            distMatrix[nrow * order[c] + r];
-        return time_matrix;
-    }')
+The **SA** algorithm solution is better than the one given by the **GA** algorithm.
+
+```{r plot 500x20}
+start <- as.numeric(sample(1:n_jobs,n_jobs)) #start randomly
+best_res   <- SA(start, time_matrix, maxIterNoChange = 30000,
+                 T_ini = 10000,T_min = 1)
+
+for (i in 1:4){
+  start <- as.numeric(sample(1:n_jobs,n_jobs)) #start randomly
+  res   <- SA(start, time_matrix, maxIterNoChange = 30000,
+              T_ini = 10000,T_min = 1)
+  if (tail(res$traceBest,1) < tail(best_res$traceBest,1))
+    best_res <- res
+}
+tail(best_res$traceBest,1) #best value found
+
+ggplot(data = data.frame(iteration=1:length(best_res$traceBest),
+                         optimal=best_res$traceBest), 
+       aes(iteration,optimal)) + 
+  geom_line() +
+  xlab("Iteration") + ylab("Best Makespan") +
+  scale_colour_brewer(palette = "Set1")
 ```
 
-## For the Extra point, NEH algorithm for the suboptimal solution
+
+# For the Extra point, NEH algorithm for the suboptimal solution
 
 ```{r NEH}
+insert_at <- function(x,pos,val){
+  "inserts at a given position (pos) the value (val) in the array x"
+  if (pos==1)
+    return(c(val,x))
+  len <- length(x)
+  if (pos==(len+1))
+    return(c(x,val))
+  return(c(x[1:pos-1],val,x[pos:len]))
+}
+
 NEH <- function(distMatrix,fun.obj,REPORT=0){
   sum <- rbind(colSums(distMatrix),1:ncol(distMatrix)) 
-  sum_order <- sum[,order(sum[1,])]
+  sum_order <- as.numeric(sum[2,order(sum[1,])])
   
-  temp_job <- rbind(cbind(sum_order[2,1],sum_order[2,2]),
-                    cbind(sum_order[2,2],sum_order[2,1]))
+  job <- sum_order[1] #the job that takes less time in all machines
   
-  if(fun.obj(1:ncol(temp_job),distMatrix[,temp_job[1,]])>
-           fun.obj(1:ncol(temp_job),distMatrix[,temp_job[2,]]))
-    job <- temp_job[2,] else
-    job <- temp_job[1,]
-  
-  for (i in 3:ncol(distMatrix)){
-    #create possible position for the new job
-    temp_job <- rbind(c(job,sum_order[2,i]),
-                      c(sum_order[2,i],job))
-    for (j in 1:(length(job)-1)){
-      temp_job<-rbind(temp_job,
-                      c(job[1:j],sum_order[2,i],job[(j+1):length(job)]))
-    }
-    t <- sapply(1:nrow(temp_job),function(x) {
-      fun.obj(1:ncol(temp_job),distMatrix[,temp_job[x,]])
-    } )
-    job <- as.numeric(temp_job[which.min(t),])
+  for (i in 2:ncol(distMatrix)){
+    temp_ris <- lapply(1:(length(job)+1), function(x) {
+                          temp_job = insert_at(job,x,sum_order[i])
+                          t <- fun.obj(1:(length(job)+1),distMatrix[,temp_job])
+                          return(list(temp_job=temp_job, t=t))
+                      })
+    t <- unlist(lapply(temp_ris, '[[','t'))
+    job <- lapply(temp_ris, '[[','temp_job')[[which.min(t)]]
     if(REPORT!=0 && i%%REPORT==0)
       print(paste0("Done ",as.character(i)," jobs"))
   }
@@ -297,12 +343,18 @@ NEH <- function(distMatrix,fun.obj,REPORT=0){
 }
 ```
 
-```{r}
-time_taken <- microbenchmark::microbenchmark(
-ris <- NEH(distMatrix = time_matrix, fun.obj = timeCpp,REPORT=100),times = 1
+```{r Try NEH}
+time_taken_NEH_500_20 <- microbenchmark::microbenchmark(
+  ris <- NEH(distMatrix = time_matrix, fun.obj = makespanCpp),
+times = 1
 )
 
 ris$value
+#ris$sol
 ```
 
+
+```{r SA after NEH}
+SA(ris$sol,time_matrix,maxIterNoChange = 10000,T_ini = 10,T_min = 1)
+```
 
