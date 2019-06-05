@@ -289,12 +289,9 @@ ggplot(df1, aes(x = iter, y = inv.value,
 
 In this case a improving trend can be seen throughout the generation and the median is always higher than the mean, which indicates that a fraction of the population has low values of makespan, which in this case is a good thing. 
 
-Since the imporving trend didn't seem to stablize even in the end, it might indicate that we need more iteration before stopping the algorithm, also the initial population is incresed to 500 to have more variability for the algorithm.
+Since the imporving trend didn't seem to stablize even in the end, it might indicate that more iteration are needed before stopping the algorithm, also the initial population is incresed to 500 to have more variability for the algorithm.
 
 ```{r GA 500x20 part 2}
-time_matrix <- as.matrix(read.csv("j500-m20",sep=" ",header = FALSE))
-n_jobs <- ncol(time_matrix)
-
 time_taken_GA_500_20 <- microbenchmark::microbenchmark(
   GA.fit <- ga(type = "permutation",
     fitness = fitnessCpp,
@@ -334,7 +331,6 @@ Using more iteration, more generations are created and the optimal solution is i
 Using the same idea as before, the SA algorithm is executed 10 times and only the best one is kept.
 
 ```{r SA 500x20 with plot}
-
 best_res = list(traceBest = Inf)
 
 time_taken_SA_500_20 <- microbenchmark::microbenchmark(
@@ -470,3 +466,160 @@ ggplot(data=df_time, aes(x=reorder(method,time),y=time)) +
 
 The time is lower for the NEH method which also gives the best solution, while the GA 2nd version with more population and runs takes more than 1000 seconds to execute not giving a satisfying solution.
 
+## Second run with 2nd table in 500x20
+
+In order to understand, if the algoritm worked well only for this table or not, the second table of the 500 jobs x 20 machines is tested, without further commenting the procedure.
+
+```{r GA per 500x20 part 2}
+time_matrix <- as.matrix(read.csv("j500-m20_2nd",
+                                  sep=" ",header = FALSE))
+n_jobs <- ncol(time_matrix)
+
+time_taken_GA_500_20_1 <- microbenchmark::microbenchmark(
+  GA.fit <- ga(type = "permutation",
+    fitness = fitnessCpp,
+    distMatrix = time_matrix,
+    lower = 1,
+    upper = n_jobs,
+    popSize = 300, 
+    maxiter = 10000,
+    run = 100,
+    pmutation = 0.2,
+    keepBest = TRUE,
+    monitor = NULL,
+    seed = 1234),
+times = 1
+)
+
+ris_GA_500_20 <- makespanCpp(GA.fit@solution[1,],time_matrix) 
+ris_GA_500_20
+```
+```{r no output plot 500x20 part 222, fig.show='hide'}
+out <- plot(GA.fit, main = "GA progression")
+```
+```{r GA.fit plot 500x20 222}
+melt(out[,c(1:3,5)],id.var="iter") %>% 
+  mutate(inv.value=1/value) -> df1
+
+ggplot(df1, aes(x = iter, y = inv.value,
+               group = variable, colour = variable)) +
+  xlab("Generation") + ylab("Makespan") +
+  geom_line(aes(lty = variable)) +
+  scale_colour_brewer(palette = "Set1") +
+  labs(title = "GA Progression with 500 jobs in 20 machines")
+```
+
+```{r GA 500x20 part 2 part 22}
+time_taken_GA_500_20 <- microbenchmark::microbenchmark(
+  GA.fit <- ga(type = "permutation",
+    fitness = fitnessCpp,
+    distMatrix = time_matrix,
+    lower = 1,
+    upper = n_jobs,
+    popSize = 500, 
+    maxiter = 10000,
+    run = 200,
+    pmutation = 0.2,
+    keepBest = TRUE,
+    monitor = NULL,
+    seed = 1234),
+times = 1
+)
+
+ris_GA_500_20_2 <- makespanCpp(GA.fit@solution[1,],time_matrix) 
+ris_GA_500_20_2
+```
+```{r no output plot 500x20 part 2 part 22, fig.show='hide'}
+out <- plot(GA.fit, main = "GA progression")
+```
+```{r GA.fit plot 500x20 part 22}
+melt(out[,c(1:3,5)],id.var="iter") %>% 
+  mutate(inv.value=1/value) -> df1
+
+ggplot(df1, aes(x = iter, y = inv.value,
+               group = variable, colour = variable)) +
+  xlab("Generation") + ylab("Makespan") +
+  geom_line(aes(lty = variable)) +
+  scale_colour_brewer(palette = "Set1") +
+  labs(title = "GA Progression with 500 jobs in 20 machines")
+```
+
+```{r SA 500x20 with plot part 2 part 2}
+best_res = list(traceBest = Inf)
+
+time_taken_SA_500_20 <- microbenchmark::microbenchmark(
+  for (i in 1:10){
+    start <- as.numeric(sample(1:n_jobs,n_jobs)) #start randomly
+    res   <- SA(start, time_matrix, maxIterNoChange = 30000,
+                T_ini = 10000,T_min = 1)
+    if (tail(res$traceBest,1) < tail(best_res$traceBest,1))
+      best_res <- res
+  },times=1)
+ris_SA_500_20 <- tail(best_res$traceBest,1) #best value found
+ris_SA_500_20
+
+ggplot(data = data.frame(iteration=1:length(best_res$traceBest),
+                         optimal=best_res$traceBest), 
+       aes(iteration,optimal)) + 
+  geom_line() +
+  xlab("Iteration") + ylab("Best Makespan") +
+  scale_colour_brewer(palette = "Set1") +
+  labs(title = "SA Progression with 500 jobs in 20 machines")
+```
+
+```{r Try NEH part 2}
+time_taken_NEH_500_20 <- microbenchmark::microbenchmark(
+  ris <- NEH(distMatrix = time_matrix, fun.obj = makespanCpp),
+times = 1
+)
+
+ris_NEH_500_20 <- ris$value
+ris_NEH_500_20
+```
+
+```{r SA after NEH part 2}
+best_SA_after_NEH <- Inf
+time_taken_SA_NEH_500_20 <- microbenchmark::microbenchmark(
+  for (i in 1:10){
+    sa.sol <- SA(ris$sol,time_matrix,
+                 maxIterNoChange = 10000,T_ini = 10,T_min = 1)
+    if (tail(sa.sol$traceBest,1) < best_SA_after_NEH)
+      best_SA_after_NEH <- tail(sa.sol$traceBest,1)
+  },times=1)
+best_SA_after_NEH
+```
+
+```{r barplot squared residue part 2}
+best <- 26520 #-- Value from the website
+residue_GA     <- (abs(ris_GA_500_20 - best)/best)*100
+residue_GA2    <- (abs(ris_GA_500_20_2 - best)/best)*100
+residue_SA     <- (abs(ris_SA_500_20 - best)/best)*100
+residue_NEH    <- (abs(ris_NEH_500_20 - best)/best)*100
+residue_NEH_SA <- (abs(best_SA_after_NEH - best)/best)*100
+
+df_bar <- data.frame(method = c("GA","GA2","SA","NEH","SA_NEH"),
+                     val = c(residue_GA,residue_GA2,
+                       residue_SA,residue_NEH,
+                       residue_NEH_SA))
+ggplot(data=df_bar, aes(x=reorder(method,val),y=val)) + 
+  geom_bar(stat = "identity") + 
+  labs(title = "Relative Mean Absolute Error (smaller is better)")+
+       xlab("Method Used")+ ylab("MAE")
+  
+```
+
+```{r time plot part 2}
+df_time <- data.frame(method = c("GA","GA2","SA","NEH","SA_NEH"),
+                     time = c(time_taken_GA_500_20_1$time/10^9,
+                            time_taken_GA_500_20$time/10^9,
+                            time_taken_SA_500_20$time/10^9,
+                            time_taken_NEH_500_20$time/10^9,
+                            time_taken_SA_NEH_500_20$time/10^9+
+                              time_taken_NEH_500_20$time/10^9))
+ggplot(data=df_time, aes(x=reorder(method,time),y=time)) + 
+  geom_bar(stat = "identity") + 
+  labs(title = "Time taken by each method (smaller is better)")+
+   xlab("Method Used")+ ylab("time in seconds")
+```
+
+It is clear even with the second table that NEH is a better algorithm than SA and GA to find the lowest makespan in the least time possible (it may be possible to optimize both NEH and SA even more using more code in C++, but it is outside the objective of this course/assignment). Applying SA after NEH is even a better choice since it might improve even more the optimal solution in a few seconds (even if it is by a little bit).
