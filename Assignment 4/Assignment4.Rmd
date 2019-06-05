@@ -2,17 +2,17 @@
 title: "Assignment 4"
 author: "Pranav Kasela $846965$"
 output:
-  pdf_document: 
-    toc: yes
-  html_document:
-    toc: yes
-    df_print: paged
   prettydoc::html_pretty:
     theme: architect
     highlight: vignette
     toc: yes
     toc_depth: 5
     df_print: paged
+  html_document:
+    toc: yes
+    df_print: paged
+  pdf_document: 
+    toc: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -149,7 +149,8 @@ times = 1
 
 summary(GA.fit)
 
-makespanCpp(GA.fit@solution[1,],time_matrix) #best time
+ris_GA_20_5 <- makespanCpp(GA.fit@solution[1,],time_matrix) #best time
+ris_GA_20_5
 ```
 ```{r no output plot, fig.show='hide'}
 out <- plot(GA.fit, main = "GA progression")
@@ -166,22 +167,23 @@ ggplot(df1, aes(x = iter, y = inv.value,
   labs(title = "GA Progression with 20 jobs in 5 machines")
 ```
 
-The **GA** algoritm finds the best solution as 1297, with an initial population of 600, a mutation probability of 20\% and a crossover probability of 80\%. An initial trend of improvement can be seen 
+The **GA** algoritm finds the best solution as 1297, with an initial population of 600, a mutation probability of 20\% and a crossover probability of 80\%. An initial trend of improvement can be seen in the figure above, bit after 50 iterations, this improvement stops.
 
 ## SA algorithm (manually implemented)
 
-The change that has been made the SA algorithm is the swapJobs function, in this case since the permutation will be done on a lot of elements (=number of jobs)
-- If the number of the jobs is greater than 10, the swap will be done on a random number of elements between 2 and 5;
-- If the number of jobs is smaller or equal to 10, the swap will be done on 2 elements.
+The change that has been made in the SA algorithm is the swapJobs function, in this case since the permutation will be done on a lot of elements (= number of jobs):
 
-The algorithm, since it's computationally easy to compute, will be done 5 time, to avoid heavy dependencies from it's probabistic nature.
+* If the number of the jobs is greater than 10, the swap will be done on a random number of elements between 2 and 5;
+* If the number of jobs is smaller or equal to 10, the swap will be done on 2 elements.
+
+The algorithm, since it's computationally easy, will be done 10 times, to avoid heavy dependencies from it's probabistic nature.
 
 ```{r SA}
 swapJobs <- function(perm){
     perm <- as.numeric(perm)
     n <- length(perm)
     if(n>10)
-      n_change <- min(sample(2:ceiling(n/5),1),5) #no more than 5 changes at a time
+      n_change <- sample(2:min(ceiling(n/5),5),1) #no more than 5 changes at a time
     else 
       n_change <- 2
     change <- sort(sample.int(n,n_change))
@@ -233,13 +235,14 @@ SA <- function(tour, distMatrix, maxIterNoChange = 2000, T_ini = 50, T_min = 1){
 start <- as.numeric(sample(1:n_jobs,n_jobs)) #start randomly
 best_res   <- SA(start, time_matrix, maxIterNoChange = 10000)
 
-for (i in 1:4){
+for (i in 1:9){
   start <- as.numeric(sample(1:n_jobs,n_jobs)) #start randomly
   res   <- SA(start, time_matrix, maxIterNoChange = 10000)
   if (tail(res$traceBest,1) < tail(best_res$traceBest,1))
     best_res <- res
 }
-tail(best_res$traceBest,1) #best value found
+ris_SA_20_5 <- tail(best_res$traceBest,1) #best value found
+ris_SA_20_5
 ```
 
 When trying with the 100x20 table, the **GA** algorithm finished in approximately 5 minutes, while **SA** algorithm finished in a few seconds giving more or less the same result (GA best makespan was 6557 while SA best makespan was 6594). The result for the 100x20 table is not provided here for the simplicity of the report.
@@ -250,7 +253,7 @@ When trying with the 100x20 table, the **GA** algorithm finished in approximatel
 time_matrix <- as.matrix(read.csv("j500-m20",sep=" ",header = FALSE))
 n_jobs <- ncol(time_matrix)
 
-time_taken_GA_500_20 <- microbenchmark::microbenchmark(
+time_taken_GA_500_20_1 <- microbenchmark::microbenchmark(
   GA.fit <- ga(type = "permutation",
     fitness = fitnessCpp,
     distMatrix = time_matrix,
@@ -266,7 +269,8 @@ time_taken_GA_500_20 <- microbenchmark::microbenchmark(
 times = 1
 )
 
-makespanCpp(GA.fit@solution[1,],time_matrix) #best time
+ris_GA_500_20 <- makespanCpp(GA.fit@solution[1,],time_matrix) 
+ris_GA_500_20
 ```
 ```{r no output plot 500x20, fig.show='hide'}
 out <- plot(GA.fit, main = "GA progression")
@@ -283,32 +287,90 @@ ggplot(df1, aes(x = iter, y = inv.value,
   labs(title = "GA Progression with 500 jobs in 20 machines")
 ```
 
-The **SA** algorithm solution is better than the one given by the **GA** algorithm.
+In this case a improving trend can be seen throughout the generation and the median is always higher than the mean, which indicates that a fraction of the population has low values of makespan, which in this case is a good thing. 
 
-```{r plot 500x20}
-start <- as.numeric(sample(1:n_jobs,n_jobs)) #start randomly
-best_res   <- SA(start, time_matrix, maxIterNoChange = 30000,
-                 T_ini = 10000,T_min = 1)
+Since the imporving trend didn't seem to stablize even in the end, it might indicate that we need more iteration before stopping the algorithm, also the initial population is incresed to 500 to have more variability for the algorithm.
 
-for (i in 1:4){
-  start <- as.numeric(sample(1:n_jobs,n_jobs)) #start randomly
-  res   <- SA(start, time_matrix, maxIterNoChange = 30000,
-              T_ini = 10000,T_min = 1)
-  if (tail(res$traceBest,1) < tail(best_res$traceBest,1))
-    best_res <- res
-}
-tail(best_res$traceBest,1) #best value found
+```{r GA 500x20 part 2}
+time_matrix <- as.matrix(read.csv("j500-m20",sep=" ",header = FALSE))
+n_jobs <- ncol(time_matrix)
+
+time_taken_GA_500_20 <- microbenchmark::microbenchmark(
+  GA.fit <- ga(type = "permutation",
+    fitness = fitnessCpp,
+    distMatrix = time_matrix,
+    lower = 1,
+    upper = n_jobs,
+    popSize = 500, 
+    maxiter = 10000,
+    run = 200,
+    pmutation = 0.2,
+    keepBest = TRUE,
+    monitor = NULL,
+    seed = 1234),
+times = 1
+)
+
+ris_GA_500_20_2 <- makespanCpp(GA.fit@solution[1,],time_matrix) 
+ris_GA_500_20_2
+```
+```{r no output plot 500x20 part 2, fig.show='hide'}
+out <- plot(GA.fit, main = "GA progression")
+```
+```{r GA.fit plot 500x20 part 2}
+melt(out[,c(1:3,5)],id.var="iter") %>% 
+  mutate(inv.value=1/value) -> df1
+
+ggplot(df1, aes(x = iter, y = inv.value,
+               group = variable, colour = variable)) +
+  xlab("Generation") + ylab("Makespan") +
+  geom_line(aes(lty = variable)) +
+  scale_colour_brewer(palette = "Set1") +
+  labs(title = "GA Progression with 500 jobs in 20 machines")
+```
+
+Using more iteration, more generations are created and the optimal solution is improved, and the is a more stable trend at the ending, increasing even more the iterations, the soution might improve but more time is required for the completion of the algorithm, instead of increasing the number of iteration or the initial population the SA algorithm is tested, which is faster than the GA. 
+
+Using the same idea as before, the SA algorithm is executed 10 times and only the best one is kept.
+
+```{r SA 500x20 with plot}
+
+best_res = list(traceBest = Inf)
+
+time_taken_SA_500_20 <- microbenchmark::microbenchmark(
+  for (i in 1:10){
+    start <- as.numeric(sample(1:n_jobs,n_jobs)) #start randomly
+    res   <- SA(start, time_matrix, maxIterNoChange = 30000,
+                T_ini = 10000,T_min = 1)
+    if (tail(res$traceBest,1) < tail(best_res$traceBest,1))
+      best_res <- res
+  },times=1)
+ris_SA_500_20 <- tail(best_res$traceBest,1) #best value found
+ris_SA_500_20
 
 ggplot(data = data.frame(iteration=1:length(best_res$traceBest),
                          optimal=best_res$traceBest), 
        aes(iteration,optimal)) + 
   geom_line() +
   xlab("Iteration") + ylab("Best Makespan") +
-  scale_colour_brewer(palette = "Set1")
+  scale_colour_brewer(palette = "Set1") +
+  labs(title = "SA Progression with 500 jobs in 20 machines")
 ```
 
 
+The **SA** algorithm solution is better than the one given by the **GA** algorithm, and timewise **SA** is very fast when compared to the **GA** algorithm.
+
 # For the Extra point, NEH algorithm for the suboptimal solution
+
+The NEH algorithm is a constructive algoritm, due to Nawaz, Ensore and Ham, basically in this algorithm consists in:
+1. Ordering the n jobs by decreasing sums of processing time on the machines.
+2. Take the first job and schedule it initially as the first job.
+3. For all the ordered jobs from 2 to n where n = total number of jobs, do the following: for k=2:n insert the k-th job at the position, which minimizes the partial makespan.
+
+The algorithm time complexity, say m=number of machines and n=number of jobs:
+The first step is done in summing all the jobs for m machines each $O(nm)$, the second step is O(1), during the third step, for the k-th job the time required is $O(km)$, which is the time required by the makespan function, plus the time to find the minimum of the times is $O(k)\subset O(km)$, since it is for all $k$, the total time is $O(nm) + \sum_{k=2}^nO(km) = O(nm)+O(m\sum_kk) = O(n^2m)$. 
+
+In this implementation the makespan function is not comletely optimized so the time order might be bigger, but since it was implemented in C++, it still executes really fast. There are methods to compute the makespan in a time order of $O(km)$ for possible position of the k-th job.
 
 ```{r NEH}
 insert_at <- function(x,pos,val){
@@ -322,15 +384,19 @@ insert_at <- function(x,pos,val){
 }
 
 NEH <- function(distMatrix,fun.obj,REPORT=0){
+  #Part 1
   sum <- rbind(colSums(distMatrix),1:ncol(distMatrix)) 
-  sum_order <- as.numeric(sum[2,order(sum[1,])])
+  sum_order <- as.numeric(sum[2,order(sum[1,],
+                                      decreasing = TRUE)])
+  #Part 2
+  job <- sum_order[1]
   
-  job <- sum_order[1] #the job that takes less time in all machines
-  
+  #Part 3
   for (i in 2:ncol(distMatrix)){
     temp_ris <- lapply(1:(length(job)+1), function(x) {
                           temp_job = insert_at(job,x,sum_order[i])
-                          t <- fun.obj(1:(length(job)+1),distMatrix[,temp_job])
+                          t <- fun.obj(1:(length(job)+1),
+                                       distMatrix[,temp_job])
                           return(list(temp_job=temp_job, t=t))
                       })
     t <- unlist(lapply(temp_ris, '[[','t'))
@@ -349,12 +415,58 @@ time_taken_NEH_500_20 <- microbenchmark::microbenchmark(
 times = 1
 )
 
-ris$value
-#ris$sol
+ris_NEH_500_20 <- ris$value
+ris_NEH_500_20
 ```
 
+The temperature of NEH can be setted as a low value, so it will search for a lower solution near the initial solution which is the one returned by the NEH method, improving possibly further the optimal solution, the lowest value this additional method on NEH has obtained has been $26639$ during the testing phases, but the result is pretty random so it may not reach that value during the new compilation of the report, or it may even find a lower value.
 
 ```{r SA after NEH}
-SA(ris$sol,time_matrix,maxIterNoChange = 10000,T_ini = 10,T_min = 1)
+best_SA_after_NEH <- Inf
+time_taken_SA_NEH_500_20 <- microbenchmark::microbenchmark(
+  for (i in 1:10){
+    sa.sol <- SA(ris$sol,time_matrix,
+                 maxIterNoChange = 10000,T_ini = 10,T_min = 1)
+    if (tail(sa.sol$traceBest,1) < best_SA_after_NEH)
+      best_SA_after_NEH <- tail(sa.sol$traceBest,1)
+  },times=1)
+best_SA_after_NEH
 ```
+
+```{r barplot squared residue}
+best <- 26040 #-- Value from the website
+residue_GA     <- (abs(ris_GA_500_20 - best)/best)*100
+residue_GA2    <- (abs(ris_GA_500_20_2 - best)/best)*100
+residue_SA     <- (abs(ris_SA_500_20 - best)/best)*100
+residue_NEH    <- (abs(ris_NEH_500_20 - best)/best)*100
+residue_NEH_SA <- (abs(best_SA_after_NEH - best)/best)*100
+
+df_bar <- data.frame(method = c("GA","GA2","SA","NEH","SA_NEH"),
+                     val = c(residue_GA,residue_GA2,
+                       residue_SA,residue_NEH,
+                       residue_NEH_SA))
+ggplot(data=df_bar, aes(x=reorder(method,val),y=val)) + 
+  geom_bar(stat = "identity") + 
+  labs(title = "Relative Mean Absolute Error (smaller is better)")+
+       xlab("Method Used")+ ylab("MAE")
+  
+```
+
+The MAE is clearly lower for NEH (and after executing SA after the solution found by NEH), while the GA has an error bigger than $8.5\%$, the SA after NEH usually improves the solution by a little bit (sometimes it doesn't help it, it's pretty random as expected).
+
+```{r time plot}
+df_time <- data.frame(method = c("GA","GA2","SA","NEH","SA_NEH"),
+                     time = c(time_taken_GA_500_20_1$time/10^9,
+                            time_taken_GA_500_20$time/10^9,
+                            time_taken_SA_500_20$time/10^9,
+                            time_taken_NEH_500_20$time/10^9,
+                            time_taken_SA_NEH_500_20$time/10^9+
+                              time_taken_NEH_500_20$time/10^9))
+ggplot(data=df_time, aes(x=reorder(method,time),y=time)) + 
+  geom_bar(stat = "identity") + 
+  labs(title = "Time taken by each method (smaller is better)")+
+   xlab("Method Used")+ ylab("time in seconds")
+```
+
+The time is lower for the NEH method which also gives the best solution, while the GA 2nd version with more population and runs takes more than 1000 seconds to execute not giving a satisfying solution.
 
