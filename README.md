@@ -2,7 +2,7 @@
 
 Reports of the assignments: **Decision Models**
 
-**Arguments**(with link to the pdf):
+The **Arguments** of the assignments(with link to the pdf):
 - [Assignment 1: Decision Trees](https://github.com/pkasela/Decision-Models/blob/master/Assignment%201/Assignment1.pdf)
 - [Assignment 2: Linear Programming](https://github.com/pkasela/Decision-Models/blob/master/Assignment%202/Assigment2.html)
 - [Assignment 3: Non linear optimization](https://github.com/pkasela/Decision-Models/blob/master/Assignment%203/Assignment3.pdf)
