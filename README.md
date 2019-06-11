@@ -7,7 +7,7 @@ Reports of the assignments: **Decision Models**
 - [Assignment 2: Linear Programming](https://github.com/pkasela/Decision-Models/blob/master/Assignment%202/Assigment2.html)
 - [Assignment 3: Non linear optimization](https://github.com/pkasela/Decision-Models/blob/master/Assignment%203/Assignment3.pdf)
 - [Assignment 4: Heuristics](https://github.com/pkasela/Decision-Models/blob/master/Assignment%204/Assignment4.pdf)
-- [Assignment 5: ??] no link yet
+- [Assignment 5: Reinforcement Learning](https://github.com/pkasela/Decision-Models/blob/master/Assignment%205/Assignment5.pdf)
 
 Full Name: Pranav **Kasela**
 
