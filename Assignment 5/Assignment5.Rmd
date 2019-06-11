@@ -1,0 +1,12 @@
+---
+title: "Assignment 5"
+author: "Pranav Kasela $846965$"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.align = 'center')
+```
+
+# Introduction to the problem
