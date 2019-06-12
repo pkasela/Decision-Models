@@ -10,3 +10,59 @@ knitr::opts_chunk$set(fig.align = 'center')
 ```
 
 # Introduction to the problem
+
+The objective of the assignment is to maximize the reward in following condition:
+
+```{r inital path, echo=FALSE, fig.cap="Representation of the problem",fig.pos='h'}
+knitr::include_graphics("img/basic_path.png")
+```
+
+The initial polict $\pi_0$ is:
+
+- $0 \to 2$
+
+- $2 \to 5$
+
+- $1 \to 4$
+
+In this particular problem, the node home can be neglected and the nodes $3,4,5,6$ can be considered as final nodes with the reward given by the node connecting these nodes to the home node.
+This way in the state function these is no need to write the the value of these nodes which remains costant.
+
+The state function for the initial policy is:
+
+\begin{align*}
+V^{\pi_0}(0)&=max\{0+\gamma \cdot 0, 0 + \gamma \cdot 2 \} = 2\\
+V^{\pi_0}(1)&=max\{0 + \gamma \cdot 4 , 0 + \gamma \cdot 0 \} = 4\\
+V^{\pi_0}(2)&=max\{0 + \gamma \cdot 2 , 0 + \gamma \cdot 3 \} = 3
+\end{align*}
+
+where the first argument indicates the path to the left and the second argument indicates the path to the right. $\gamma = 1$ has been decided.
+
+
+The new policy $\pi_1$ now is:
+
+- $0 \to 2$
+
+- $2 \to 6$
+
+- $1 \to 3$
+
+The state function in $\pi_1$ is:
+
+\begin{align*}
+V^{\pi_1}(0)&=max\{0+\gamma \cdot 4, 0 + \gamma \cdot 3 \} = 4\\
+V^{\pi_1}(1)&=max\{0 + \gamma \cdot 4 , 0 + \gamma \cdot 0 \} = 4\\
+V^{\pi_1}(2)&=max\{0 + \gamma \cdot 2 , 0 + \gamma \cdot 3 \} = 3
+\end{align*}
+
+The new policy derived from the state function is $\pi_2$:
+
+- $0 \to 1$
+
+- $2 \to 6$
+
+- $1 \to 3$
+
+Actually this is the best path, but to confirm the convergence the next step is needed.
+
+It can be verified immediatly that the state function does not change and that $\pi_3 = \pi_2$, which is the condition for the convergence.
