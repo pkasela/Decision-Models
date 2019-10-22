@@ -1,2 +1,14 @@
-*.Rmd linguist-language=R
-*.html linguist-generated=true
+Assignment\ 1/*.Rmd linguist-language=R
+Assignment\ 1/*.html linguist-generated=true
+
+Assignment\ 2/*.Rmd linguist-language=R
+Assignment\ 2/*.html linguist-generated=true
+
+Assignment\ 3/*.Rmd linguist-language=R
+Assignment\ 3/*.html linguist-generated=true
+
+Assignment\ 4/*.Rmd linguist-language=R
+Assignment\ 4/*.html linguist-generated=true
+
+Assignment\ 5/*.Rmd linguist-language=R
+Assignment\ 5/*.html linguist-generated=true
